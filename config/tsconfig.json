@@ -1,0 +1,23 @@
+{
+    "compileOnSave": false,
+    "compilerOptions": {
+        "declaration": false,
+        "skipLibCheck": true,
+        "outDir": "../dist/tsc",
+        "sourceMap": true,
+        "strict": true,
+        "noImplicitReturns": true,
+        "noImplicitAny": true,
+        "module": "es6",
+        "moduleResolution": "node",
+        "target": "es5",
+        "allowJs": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "lib": ["es2015", "es6", "es2017", "dom"],
+        "suppressImplicitAnyIndexErrors": true,
+        "typeRoots": [
+            "../node_modules/@types"
+        ],
+    }
+}

@@ -1,0 +1,83 @@
+{
+    "source": {
+        "srcDir": "src",
+        "appDir": "app",
+        "e2eDir": "e2e",
+        "buildDir": "dist",
+        "allowedExtension": [".ts", ".js", ".scss", ".css"],
+        "appTsConfig": "tsconfig.app.json",
+        "appSpecTsConfig": "tsconfig.spec.json",
+        "reportsDir": "reports",
+        "assetsDir": "assets",
+        "tasksDir": "tasks"
+    },
+    "banner": {
+        "content": ["Hello",
+            "Version: <%= version %>",
+            "line 1: <%= package %>",
+            "Build Date and Time: <%= buildDt %>"
+        ]
+    },
+    "assets": {
+        "font": "",
+        "images": ""
+    },
+    "environment": {
+        "dev": "development",
+        "prod": "production"
+    },
+    "bundle": {
+        "jsPattern": "js/[name].[hash:8].js",
+        "cssPattern": "css/[name].[hash:8].css"
+    },
+    "test": {
+        "e2e": {},
+        "junit": {
+            "frameworks": ["jasmine"],
+            "browsers": ["Chrome"],
+            "reporters": ["kjhtml", "progress", "coverage"],
+            "preprocessors": ["webpack", "sourcemap"],
+            "port": 9876,
+            "singleRun": true,
+            "reportDir": "coverage",
+            "files": [{
+                "pattern": "../../src/test.ts",
+                "watched": false
+            }, {
+                "pattern": "../../src/assets/**/*.*",
+                "included": false,
+                "served": true
+            }],
+            "tsMime": ["ts", "tsx"]
+        }
+    },
+    "server": {
+        "port": 5656,
+        "https": false,
+        "host": "localhost",
+        "proxy": {
+            "/api": "http://localhost:3000"
+        },
+        "path": "/"
+    },
+    "environments": {
+        "dev": "development",
+        "prod": "production"
+    },
+    "indexHtml": {
+        "templateFile": "index.tpl.ejs",
+        "title": "Angular Webpack Demo",
+        "baseHref": "/",
+        "metas": [{
+                "name": "Keywords",
+                "content": ["angular", "webpack", "css"]
+            },
+            {
+                "name": "viewport",
+                "content": "width=device-width, initial-scale=1"
+            }
+        ],
+        "links": [],
+        "js": []
+    }
+}
