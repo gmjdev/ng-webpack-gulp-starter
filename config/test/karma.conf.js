@@ -11,6 +11,8 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const env = appProgram.validateAndGetEnvironment(appConfig.environment);
+const baseDir = path.join(cwd, appConfig.source.buildDir, appConfig.source.reportsDir,
+    appConfig.test.junit.reportDir);
 
 export default function (config) {
     config.set({
@@ -20,20 +22,18 @@ export default function (config) {
 
         frameworks: appConfig.test.junit.frameworks,
 
-        reporters: appConfig.test.junit.reporters,
+        reporters: ["progress", "kjhtml", "coverage", 'remap-coverage'],
 
         preprocessors: {
-            '../../src/test.ts': appConfig.test.junit.preprocessors
+            '../../src/test.ts': ["webpack", "sourcemap", "coverage"]
         },
 
         files: appConfig.test.junit.files,
 
         failOnEmptyTestSuite: false,
 
-        // Webpack Config at ./webpack.test.js
         webpack: webpackTestConfig,
 
-        // Webpack please don't spam the console when running in karma!
         webpackMiddleware: {
             //'errors-only' - print error onlys
             stats: 'normal'
@@ -46,16 +46,24 @@ export default function (config) {
         },
         coverageReporter: {
             type: 'in-memory',
-            dir: path.join(cwd, appConfig.source.buildDir, env, appConfig.source.reportsDir,
-                appConfig.junit.reportDir),
-            reporters: [{
+            dir: path.join(cwd, appConfig.source.buildDir, appConfig.source.reportsDir,
+                appConfig.test.junit.reportDir),
+            /*reporters: [{
                 type: 'text-summary'
             }, {
                 type: 'html',
                 subdir: 'html'
+            }, {
+                type: 'cobertura',
+                subdir: '.',
+                file: 'cobertura-coverage.xml'
+            }, {
+                type: 'lcovonly',
+                subdir: '.',
+                file: 'lcovonly-coverage.txt'
             }],
             fixWebpackSourcePaths: true,
-            check: {
+            /*check: {
                 global: {
                     statements: 50,
                     branches: 50,
@@ -71,24 +79,12 @@ export default function (config) {
                     excludes: [],
                     overrides: {}
                 }
-            },
+            },*/
         },
         remapCoverageReporter: {
-            html: './coverage/html',
-            cobertura: './coverage/cobertura.xml'
+            html: path.join(baseDir, 'html'),
+            cobertura: path.join(baseDir, 'cobertura.xml')
         },
-
-        /*karmaTypescriptConfig: {
-            tsconfig: '../../src/tsconfig.spec.json',
-            compilerOptions: {
-                module: "commonjs"
-            },
-            bundlerOptions: {
-                resolve: {
-                    directories: [appConfig.source.srcDir, "node_modules"]
-                }
-            }
-        },*/
         mime: {
             'text/x-typescript': appConfig.test.junit.tsMime
         },

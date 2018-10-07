@@ -1,6 +1,7 @@
 {
   "extends": "../config/tsconfig.json",
   "compilerOptions": {
+    "sourceMap": true,
     "outDir": "../dist/tsc/spec",
     "baseUrl": "./",
     "module": "commonjs",

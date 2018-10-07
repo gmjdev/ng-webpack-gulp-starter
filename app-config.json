@@ -35,7 +35,7 @@
         "junit": {
             "frameworks": ["jasmine"],
             "browsers": ["Chrome"],
-            "reporters": ["kjhtml", "progress", "coverage"],
+            "reporters": ["progress", "kjhtml", "coverage"],
             "preprocessors": ["webpack", "sourcemap"],
             "port": 9876,
             "singleRun": true,

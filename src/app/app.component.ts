@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   private title = 'Tour of Heroes';
+
+  test() {
+    console.log('hello from test');
+  }
 }
