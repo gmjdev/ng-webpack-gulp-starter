@@ -31,15 +31,21 @@
         "cssPattern": "css/[name].[hash:8].css"
     },
     "test": {
+        "report": {
+            "junitDir": "junit",
+            "coverageDir": "coverage",
+            "junitReportFileName": "junit-result.html",
+            "coberturaFileName": "cobertura.xml",
+            "lcovonlyFileName": "lcovonly.txt"
+        },
         "e2e": {},
         "junit": {
             "frameworks": ["jasmine"],
             "browsers": ["Chrome"],
-            "reporters": ["progress", "kjhtml", "coverage"],
-            "preprocessors": ["webpack", "sourcemap"],
+            "reporters": ["kjhtml", "html", "coverage", "remap-coverage"],
+            "preprocessors": ["webpack", "sourcemap", "coverage"],
             "port": 9876,
             "singleRun": true,
-            "reportDir": "coverage",
             "files": [{
                 "pattern": "../../src/test.ts",
                 "watched": false
