@@ -3,10 +3,10 @@ import {
 }
 from 'jasmine-spec-reporter';
 
-exports.config = {
+export const config = {
   allScriptsTimeout: 11000,
   specs: [
-    './**/*.e2e-spec.ts'
+    'C:\source\ng-webpack-gulp-starter\**\*.e2e.ts'
   ],
   capabilities: {
     'browserName': 'chrome',

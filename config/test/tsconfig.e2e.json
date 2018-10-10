@@ -1,0 +1,23 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "../../dist/tsc/e2e",
+    "baseUrl": "./",
+    "sourceMap": false,
+    "removeComments": false,
+    "noImplicitAny": false,
+    "module": "commonjs",
+    "target": "es5",
+    "types": [
+      "jasmine",
+      "jasminewd2",
+      "node"
+    ]
+  },
+  "include": [
+    "./e2e/*/*.e2e.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
