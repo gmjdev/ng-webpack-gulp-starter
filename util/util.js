@@ -87,6 +87,10 @@ class IoUtil {
                 'please specify valid environments from: ') + chalk.green(JSON.stringify(validEnv)));
         }
     }
+
+    static fileExists(filePath) {
+        return fs.existsSync(filePath);
+    }
 }
 
 export {

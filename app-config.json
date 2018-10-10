@@ -38,11 +38,16 @@
             "coberturaFileName": "cobertura.xml",
             "lcovonlyFileName": "lcovonly.txt"
         },
-        "e2e": {},
+        "e2e": {
+            "specFile": "src/app/**/*.e2e.ts",
+            "htmlReportFileName": "app.e2e",
+            "configFile": "protractor.conf.js",
+            "junitFilePrefix": "app-junit-e2e-"
+        },
         "junit": {
             "frameworks": ["jasmine"],
             "browsers": ["Chrome"],
-            "reporters": ["kjhtml", "html", "coverage", "remap-coverage"],
+            "reporters": ["mocha", "kjhtml", "html", "coverage", "remap-coverage"],
             "preprocessors": ["webpack", "sourcemap", "coverage"],
             "port": 9876,
             "singleRun": true,

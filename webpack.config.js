@@ -21,11 +21,11 @@ const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 let webPackConfig = {};
 if (appProgram.validateAndGetEnvironment(appConfig.environment) ===
     appConfig.environment.prod) {
-    LogUtil.info('App', 'Processing build for release / production environment');
+    LogUtil.info('app', 'Processing build for release / production environment');
     webPackConfig = ProdWebPackConfig;
 } else if (appProgram.validateAndGetEnvironment(appConfig.environment) ===
     appConfig.environment.dev) {
-    LogUtil.info('App', 'Processing build for development environment');
+    LogUtil.info('app', 'Processing build for development environment');
     webPackConfig = DevWebPackConfig;
 }
 export default webPackConfig;

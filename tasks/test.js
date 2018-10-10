@@ -15,27 +15,24 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export function test(done) {
-    var env = appProgram.validateAndGetEnvironment(appConfig.environment);
-    LogUtil.info('test', 'Testing Application for environment: ' + env);
-
-    // path.join(cwd, appConfig.source.buildDir, env, appConfig.source.reportsDir, appConfig.junit.reportDir);
-
+export default function test(done) {
+    LogUtil.info('test', 'Running Unit testing for application...');
     const server = new Server({
         configFile: path.join(cwd, 'config', 'test', 'karma.conf.js'),
         singleRun: true
     }, (err) => {
         if (err === 0) {
+            LogUtil.info('test', 'Unit testing completed successfully');
             done();
         } else {
-            LogUtil.error('test', 'Test Task exited with status code : ' + err);
+            LogUtil.error('test', 'Unit testing resulted into error with status code: ' + err);
             process.exit(err);
         }
     });
     server.start();
     server.on('run_complete', function (browsers, result) {
         if (result.failed > 0) {
-            LogUtil.error('test', 'Failed due to failed test-cases count: ' +
+            LogUtil.error('test', 'Unit testing with test failures, No of Failed Test count' +
                 result.failed);
             process.exit(result.exitCode);
         }

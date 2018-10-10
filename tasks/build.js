@@ -14,7 +14,7 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export function build(done) {
+export default function build(done) {
     var env = appProgram.validateAndGetEnvironment(appConfig.environment);
     LogUtil.info('build', 'Building Application for environment: ' + env);
     webpack(webPackConfig, (err, stats) => {
