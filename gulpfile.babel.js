@@ -10,7 +10,10 @@ import {
 } from './tasks/serve';
 import build from './tasks/build';
 import test from './tasks/test';
-import e2e from './tasks/e2e';
+import {
+    e2e,
+    webDriverMngrUpdate
+} from './tasks/e2e';
 
 
 const buildAndServe = series(build, serveBuild);
@@ -20,6 +23,7 @@ export {
     serve,
     test,
     build,
+    webDriverMngrUpdate,
     buildAndServe
 }
 

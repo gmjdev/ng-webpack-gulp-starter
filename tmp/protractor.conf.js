@@ -2,27 +2,43 @@
 
 
 
+var _protractor = _interopRequireDefault(require("../../util/protractor.util"));
+var _seleniumWebdriver = require("selenium-webdriver");function _interopRequireDefault(obj) {return obj && obj.__esModule ? obj : { default: obj };}function _readOnlyError(name) {throw new Error("\"" + name + "\" is read-only");}
+
+
+
+var webDriverMngrPath = path.resolve(cwd, './node_modules/webdriver-manager');
+var seleniumServerJarLocation = _protractor.default.findSeleniumJarPath(webDriverMngrPath);
+seleniumServerJarLocation = (_readOnlyError("seleniumServerJarLocation"), './' + path.relative(__dirname, seleniumServerJarLocation));
 
 var config = {
   allScriptsTimeout: 11000,
+  seleniumServerJar: seleniumServerJarLocation,
   specs: [
   'C:\source\ng-webpack-gulp-starter\**\*.e2e.ts'],
 
   capabilities: {
     'browserName': 'chrome',
-    // For Travis CI only
     chromeOptions: {
       binary: process.env.CHROME_BIN,
       args: ['--no-sandbox'] } },
 
 
+
   directConnect: true,
+
   baseUrl: 'http://localhost:4200/',
+
   framework: 'jasmine',
+
   jasmineNodeOpts: {
+    showTiming: true,
     showColors: true,
-    defaultTimeoutInterval: 30000,
-    print: function print() {} },
+    isVerbose: false,
+    includeStackTrace: false,
+    defaultTimeoutInterval: 60000,
+    print: function print(msg) {return console.log(msg);} },
+
 
   onPrepare: function onPrepare() {
     require('ts-node').register({

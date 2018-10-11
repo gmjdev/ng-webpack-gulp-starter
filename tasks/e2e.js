@@ -7,7 +7,7 @@ import {
     IoUtil,
     LogUtil
 } from '../util/util';
-import webPackConfig from '../webpack.config';
+import SocketIoUtil from '../util/socketIo.util';
 import {
     appProgram
 } from '../config/app.config.options';
@@ -19,7 +19,9 @@ import gulpCompileEs6 from './gulp-compile-es6';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export default function e2e(done) {
+let webDriverMngrUpdate = protractor.webdriver_update;
+
+function e2e(done) {
     LogUtil.info('e2e', 'Starting End to End application testing....');
     const configFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.configFile);
     const e2eTsConfigFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.tsConfigFile);
@@ -39,6 +41,7 @@ export default function e2e(done) {
 
     const callback = gulpCompileEs6(configFileLoc, tmpLoc);
     // const callback2 = gulpCompileTs(e2eTsConfigFileLoc);
+    console.log('--->' + JSON.stringify(protractor));
 
     LogUtil.info('e2e', 'Using Protractor typescript configuration file: "' +
         e2eTsConfigFileLoc + '"');
@@ -48,12 +51,17 @@ export default function e2e(done) {
         }))
         .on('end', function (e) {
             LogUtil.info('e2e', 'Completed End to End application testing successfully :) !!!');
-            // socketIoUtil.emitEvent(url, 'asyncComplete');
+            SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         })
         .on('error', function (e) {
             LogUtil.error('e2e', 'Completed End to End application with error :(');
-            //socketIoUtil.emitEvent(url, 'asyncComplete');
+            SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         });
 }
+
+export {
+    webDriverMngrUpdate,
+    e2e
+};
