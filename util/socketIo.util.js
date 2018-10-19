@@ -14,7 +14,7 @@ export default class SocketIoUtil {
         });
     }
 
-    static clientEmitEvent(url, event, callback) {
+    static emitEvent(url, event, callback) {
         if (!callback) {
             callback = function () {
                 setTimeout(function () {

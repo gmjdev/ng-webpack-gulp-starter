@@ -2,29 +2,14 @@
 
 import {
     series,
-    parallel
-} from 'gulp';
-import {
-    serve,
-    serveBuild
-} from './tasks/serve';
-import build from './tasks/build';
-import test from './tasks/test';
-import {
-    e2e,
-    webDriverMngrUpdate
-} from './tasks/e2e';
-
-
-const buildAndServe = series(build, serveBuild);
-
-export {
-    e2e,
-    serve,
-    test,
-    build,
-    webDriverMngrUpdate,
-    buildAndServe
+    parallel,
+    registry
 }
+from 'gulp';
+import serve from './tasks/serve';
+import HubRegistry from 'gulp-hub';
 
-export default serve;
+const hub = new HubRegistry(['tasks/*.js']);
+registry(hub);
+
+exports.default = serve;

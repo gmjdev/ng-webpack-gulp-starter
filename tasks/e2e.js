@@ -9,9 +9,6 @@ import {
 } from '../util/util';
 import SocketIoUtil from '../util/socketIo.util';
 import {
-    appProgram
-} from '../config/app.config.options';
-import {
     protractor
 } from 'gulp-protractor'
 import gulpCompileEs6 from './gulp-compile-es6';
@@ -39,7 +36,10 @@ function e2e(done) {
         throw new Error('Missing Protractor Typescript configuration :(');
     }
 
-    const callback = gulpCompileEs6(configFileLoc, tmpLoc);
+    const filesToCompile = [path.join(cwd, "**/*.js"), '!node_modules/**/*',
+        '!dist/**/*'
+    ];
+    const callback = gulpCompileEs6(filesToCompile, tmpLoc);
     // const callback2 = gulpCompileTs(e2eTsConfigFileLoc);
     console.log('--->' + JSON.stringify(protractor));
 
@@ -47,16 +47,18 @@ function e2e(done) {
         e2eTsConfigFileLoc + '"');
     return gulp.src(appConfig.test.e2e.specFile)
         .pipe(protractor({
-            configFile: path.join(tmpLoc, appConfig.test.e2e.configFile)
+            configFile: path.join(tmpLoc, 'config', 'test', appConfig.test.e2e.configFile)
         }))
         .on('end', function (e) {
             LogUtil.info('e2e', 'Completed End to End application testing successfully :) !!!');
-            SocketIoUtil.emitEvent(url, 'asyncComplete');
+            // SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         })
         .on('error', function (e) {
             LogUtil.error('e2e', 'Completed End to End application with error :(');
-            SocketIoUtil.emitEvent(url, 'asyncComplete');
+            LogUtil.error('e2e', 'Error' + JSON.stringify(e));
+            const url = 'url';
+            // SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         });
 }

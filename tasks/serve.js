@@ -11,6 +11,10 @@ import {
 } from '../util/util';
 import webPackConfig from '../webpack.config';
 import opn from 'opn';
+import {
+    appProgram
+}
+from '../config/app.config.options';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -23,23 +27,27 @@ function buildUrl() {
     return url;
 }
 
-export function serveBuild() {
+function serveBuild() {
     const app = express();
     const env = appProgram.validateAndGetEnvironment(appConfig.environment);
-    LogUtil.info('[serve]: Serving Application for environment: ' + env);
+    LogUtil.info('serve', `Serving Application for environment: ${env}`);
     const directory = appConfig.source.buildDir;
     const servePath = path.join(cwd, directory, env);
-    LogUtil.info(`[serve]: Serving build from: ${servePath}`);
+    LogUtil.info('serve', `Serving build from: ${servePath}`);
     app.use(express.static(servePath));
     app.listen(webPackConfig.devServer.port, () => {
         const url = buildUrl();
-        LogUtil.info(`[serve]: Open your browser if it is not already opened @ ${url}`);
+        LogUtil.info('serve', `Open your browser if it is not already opened @ ${url}`);
         opn(url);
     });
 }
+serveBuild.displayName = 'serve:build:display';
+serveBuild.name = 'serve:build:name';
+serveBuild.description = 'Description';
 
-export function serve() {
-    LogUtil.info('[serve]: Running Webpack build Server...');
+
+function serve() {
+    LogUtil.info('serv', 'Running Webpack build Server...');
     const compiler = webpack(webPackConfig);
     const app = express();
     app.use(middleware(compiler, {
@@ -58,7 +66,13 @@ export function serve() {
     app.use(hotMiddleware(compiler));
     app.listen(webPackConfig.devServer.port, () => {
         const url = buildUrl();
-        LogUtil.info(`[serve]: Open your browser if it is not already opened @ ${url}`);
+        LogUtil.info('serve', `Open your browser if it is not already opened @ ${url}`);
         opn(url);
     });
 }
+serve.displayName = 'serve:display';
+serve.name = 'serve:name';
+serve.description = 'serve:Description';
+
+exports.default = serve;
+exports.serveBuild = serveBuild;

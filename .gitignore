@@ -3,4 +3,5 @@
 **/dist/**
 **/coverage/**
 **/reports/**
+**/tmp/**
 package-lock.json

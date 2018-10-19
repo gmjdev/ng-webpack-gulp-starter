@@ -2,18 +2,15 @@ import {
   SpecReporter
 }
 from 'jasmine-spec-reporter';
-import ProtractorUtil from '../../util/protractor.util';
-import {
-  WebDriver
-} from 'selenium-webdriver'
+import ProtractorUtil from '../util/protractor.util';
 
-const webDriverMngrPath = path.resolve(cwd, './node_modules/webdriver-manager');
-const seleniumServerJarLocation = ProtractorUtil.findSeleniumJarPath(webDriverMngrPath);
-seleniumServerJarLocation = './' + path.relative(__dirname, seleniumServerJarLocation);
+// const webDriverMngrPath = path.resolve(cwd, './node_modules/webdriver-manager');
+// const seleniumServerJarLocation = ProtractorUtil.findSeleniumJarPath(webDriverMngrPath);
+// seleniumServerJarLocation = './' + path.relative(__dirname, seleniumServerJarLocation);
 
 export const config = {
   allScriptsTimeout: 11000,
-  seleniumServerJar: seleniumServerJarLocation,
+  // seleniumServerJar: seleniumServerJarLocation,
   specs: [
     'C:\source\ng-webpack-gulp-starter\**\*.e2e.ts'
   ],
