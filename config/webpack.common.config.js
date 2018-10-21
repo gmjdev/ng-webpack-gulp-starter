@@ -14,10 +14,6 @@ import CompressionPlugin from 'compression-webpack-plugin';
 import {
     _
 } from 'lodash';
-import {
-    AngularCompilerPlugin
-}
-from '@ngtools/webpack'
 import * as moment from 'moment';
 
 const cwd = process.cwd();

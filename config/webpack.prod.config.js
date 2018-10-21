@@ -23,7 +23,7 @@ let cleanOptions = {
     dry: false
 };
 
-export const ProdWebPackConfig = merge(WebPackCommonConfig, {
+export const config = merge(WebPackCommonConfig, {
     mode: 'production',
     output: {
         path: path.resolve(cwd, appConfig.source.buildDir, appConfig.environment.prod)

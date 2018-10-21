@@ -1,8 +1,6 @@
 "use strict";
 
 import path from 'path';
-import gulp from 'gulp';
-
 import {
     IoUtil,
     LogUtil
@@ -16,9 +14,9 @@ import gulpCompileEs6 from './gulp-compile-es6';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-let webDriverMngrUpdate = protractor.webdriver_update;
+export const webDriverMngrUpdate = protractor.webdriver_update;
 
-function e2e(done) {
+export function e2e(done) {
     LogUtil.info('e2e', 'Starting End to End application testing....');
     const configFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.configFile);
     const e2eTsConfigFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.tsConfigFile);
@@ -61,9 +59,4 @@ function e2e(done) {
             // SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         });
-}
-
-export {
-    webDriverMngrUpdate,
-    e2e
 };

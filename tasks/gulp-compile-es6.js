@@ -7,7 +7,7 @@ import {
     LogUtil
 } from '../util/util';
 
-export default function gulpCompileEs6(files, dist) {
+export function gulpCompileEs6(files, dist) {
     LogUtil.info('compile:es6', 'Compiling Javascript...')
     return gulp.src(files)
         .pipe(babel())

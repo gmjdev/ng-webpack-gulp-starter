@@ -22,7 +22,7 @@ let cleanOptions = {
     dry: false
 };
 
-export const DevWebPackConfig = merge(WebPackCommonConfig, {
+export const config = merge(WebPackCommonConfig, {
     mode: 'development',
     devtool: 'inline-source-map',
     entry: {

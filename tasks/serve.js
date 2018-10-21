@@ -1,5 +1,3 @@
-"use strict";
-
 import path from 'path';
 import webpack from 'webpack';
 import middleware from 'webpack-dev-middleware';
@@ -7,12 +5,11 @@ import hotMiddleware from 'webpack-hot-middleware';
 import express from 'express';
 import {
     IoUtil,
-    LogUtil
+    LogUtil,
 } from '../util/util';
-import webPackConfig from '../webpack.config';
 import opn from 'opn';
 import {
-    appProgram
+    AppProgram
 }
 from '../config/app.config.options';
 
@@ -27,10 +24,11 @@ function buildUrl() {
     return url;
 }
 
-function serveBuild() {
+export function serveBuild() {
     const app = express();
-    const env = appProgram.validateAndGetEnvironment(appConfig.environment);
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
     LogUtil.info('serve', `Serving Application for environment: ${env}`);
+    const webPackConfig = require('../config/webpack.' + env + '.config').config;
     const directory = appConfig.source.buildDir;
     const servePath = path.join(cwd, directory, env);
     LogUtil.info('serve', `Serving build from: ${servePath}`);
@@ -41,13 +39,15 @@ function serveBuild() {
         opn(url);
     });
 }
-serveBuild.displayName = 'serve:build:display';
-serveBuild.name = 'serve:build:name';
-serveBuild.description = 'Description';
+// serveBuild.displayName = 'serve:build:display';
+// serveBuild.name = 'serve:build:name';
+// serveBuild.description = 'Description';
 
 
-function serve() {
+export function serve() {
     LogUtil.info('serv', 'Running Webpack build Server...');
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
+    const webPackConfig = require('../config/webpack.' + env + '.config').config;
     const compiler = webpack(webPackConfig);
     const app = express();
     app.use(middleware(compiler, {
@@ -70,9 +70,6 @@ function serve() {
         opn(url);
     });
 }
-serve.displayName = 'serve:display';
-serve.name = 'serve:name';
-serve.description = 'serve:Description';
-
-exports.default = serve;
-exports.serveBuild = serveBuild;
+// serve.displayName = 'serve:display';
+// serve.name = 'serve:name';
+// serve.description = 'serve:Description';

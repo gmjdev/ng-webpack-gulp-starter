@@ -12,7 +12,7 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export default function gulpCompileTs(tsConfig, files) {
+export function gulpCompileTs(tsConfig, files) {
     if (!IoUtil.fileExists(tsConfig)) {
         LogUtil.error('compile:ts',
             'Provided typescript configuration file does not exists "' +

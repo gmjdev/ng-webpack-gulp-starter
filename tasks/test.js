@@ -6,9 +6,6 @@ import {
     LogUtil
 } from '../util/util';
 import {
-    appProgram
-} from '../config/app.config.options';
-import {
     Server
 } from 'karma';
 

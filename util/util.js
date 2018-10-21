@@ -93,7 +93,10 @@ class IoUtil {
         let validEnv = [];
         let exists = Object.keys(availableEnvironment).some(function (key) {
             validEnv.push(availableEnvironment[key].toLowerCase());
-            return availableEnvironment[key].toLowerCase() === env.toLowerCase();
+            if (availableEnvironment[key].toLowerCase() === env.toLowerCase()) {
+                console.log('Key--->' + key + "  " + availableEnvironment[key]);
+                return key;
+            }
         });
 
         if (!exists) {

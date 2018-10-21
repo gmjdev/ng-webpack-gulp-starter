@@ -6,7 +6,6 @@ import {
     IoUtil,
     LogUtil
 } from '../util/util';
-import webPackConfig from '../webpack.config';
 import {
     appProgram
 } from '../config/app.config.options';
@@ -14,10 +13,12 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export default function build(done) {
+export function build(done) {
     var env = appProgram.validateAndGetEnvironment(appConfig.environment);
+    const webPkEnv = appConfig.environment.prod === env ? 'prod' : 'dev';
+    var config = require('../config/webpack.' + webPkEnv + '.config').config;
     LogUtil.info('build', 'Building Application for environment: ' + env);
-    webpack(webPackConfig, (err, stats) => {
+    webpack(config, (err, stats) => {
         if (err) {
             LogUtil.error('build', 'Unable to process build :(');
             LogUtil.error('build', 'Error: ' + JSON.stringify(stats));
