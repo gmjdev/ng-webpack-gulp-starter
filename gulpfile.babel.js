@@ -21,11 +21,17 @@ import {
 import {
     testTask
 } from './tasks/test.task';
+import {
+    tsLintTask,
+    jsLintTask
+} from './tasks/lint.task';
 
 gulp.task(serveTask);
 gulp.task(serveBuildTask);
 gulp.task(gulpCompileEs6Task);
 gulp.task(gulpCompileTsTask);
+gulp.task(jsLintTask);
+gulp.task(tsLintTask);
 gulp.task(buildTask);
 gulp.task(testTask);
 gulp.task(e2eTask);

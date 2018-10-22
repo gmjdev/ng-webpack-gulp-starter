@@ -25,7 +25,7 @@ class LogUtil {
     }
 
     static error(task, msg) {
-        console.log(chalk.redBright(`[${task}]: `) + msg);
+        console.log(chalk.redBright(`[${task}] `) + msg);
     }
 
     static success(msg) {
@@ -33,7 +33,7 @@ class LogUtil {
     }
 
     static success(task, msg) {
-        console.log(chalk.green(`[${task}]: `) + msg);
+        console.log(chalk.green(`[${task}] `) + msg);
     }
 
     static warning(msg) {
@@ -41,7 +41,7 @@ class LogUtil {
     }
 
     static warning(task, msg) {
-        console.log(chalk.red(`[${task}]: `) + msg);
+        console.log(chalk.red(`[${task}] `) + msg);
     }
 
     static info(msg) {
@@ -49,7 +49,7 @@ class LogUtil {
     }
 
     static info(task, msg) {
-        console.log(chalk.yellowBright(`[${task}]: `) + msg);
+        console.log(chalk.yellowBright(`[${task}] `) + msg);
     }
 }
 
