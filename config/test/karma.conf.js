@@ -1,8 +1,5 @@
 import path from 'path';
 import {
-    appProgram
-} from '../app.config.options';
-import {
     IoUtil
 } from '../../util/util';
 import {

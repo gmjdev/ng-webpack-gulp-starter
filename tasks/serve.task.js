@@ -24,7 +24,7 @@ function buildUrl() {
     return url;
 }
 
-export function serveBuild() {
+function serveBuild() {
     const app = express();
     const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
     LogUtil.info('serve', `Serving Application for environment: ${env}`);
@@ -39,12 +39,8 @@ export function serveBuild() {
         opn(url);
     });
 }
-// serveBuild.displayName = 'serve:build:display';
-// serveBuild.name = 'serve:build:name';
-// serveBuild.description = 'Description';
 
-
-export function serve() {
+function serve() {
     LogUtil.info('serv', 'Running Webpack build Server...');
     const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
     const webPackConfig = require('../config/webpack.' + env + '.config').config;
@@ -70,6 +66,16 @@ export function serve() {
         opn(url);
     });
 }
-// serve.displayName = 'serve:display';
-// serve.name = 'serve:name';
-// serve.description = 'serve:Description';
+
+let serveTask = serve;
+serveTask.displayName = 'serve';
+serveTask.description = 'serve description';
+
+let serveBuildTask = serveBuild;
+serveBuildTask.displayName = 'serve:build';
+serveBuildTask.description = 'serve:build description';
+
+export {
+    serveTask,
+    serveBuildTask
+};

@@ -91,18 +91,16 @@ class IoUtil {
 
     static validateEnvironment(availableEnvironment, env) {
         let validEnv = [];
-        let exists = Object.keys(availableEnvironment).some(function (key) {
+        let exists = _.find(Object.keys(availableEnvironment), (key) => {
             validEnv.push(availableEnvironment[key].toLowerCase());
-            if (availableEnvironment[key].toLowerCase() === env.toLowerCase()) {
-                console.log('Key--->' + key + "  " + availableEnvironment[key]);
-                return key;
-            }
+            return availableEnvironment[key].toLowerCase() === env.toLowerCase();
         });
 
         if (!exists) {
             throw new Error(chalk.red('Unsupported environment is specified, ' +
                 'please specify valid environments from: ') + chalk.green(JSON.stringify(validEnv)));
         }
+        return exists;
     }
 
     static fileExists(filePath) {

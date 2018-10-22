@@ -2,31 +2,31 @@
 
 import gulp from 'gulp';
 import {
-    e2e,
-    webDriverMngrUpdate
-} from './tasks/e2e';
+    e2eTask,
+    webDriverMngrUpdateTask
+} from './tasks/e2e.task';
 import {
-    build
-} from './tasks/build';
+    buildTask
+} from './tasks/build.task';
 import {
-    gulpCompileEs6
-} from './tasks/gulp-compile-es6';
+    gulpCompileEs6Task
+} from './tasks/gulp-compile-es6.task';
 import {
-    gulpCompileTs
-} from './tasks/gulp-compile-ts';
+    gulpCompileTsTask
+} from './tasks/gulp-compile-ts.task';
 import {
-    serve,
-    serveBuild
-} from './tasks/serve';
+    serveTask,
+    serveBuildTask
+} from './tasks/serve.task';
 import {
-    test
-} from './tasks/test';
+    testTask
+} from './tasks/test.task';
 
-gulp.task('serve', serve);
-gulp.task('serve:build', serveBuild);
-gulp.task('compile:ts', gulpCompileTs);
-gulp.task('compile:es6', gulpCompileEs6);
-gulp.task('build', build);
-gulp.task('test:e2e', e2e);
-gulp.task('test:update', webDriverMngrUpdate);
-gulp.task('test:junit', test);
+gulp.task(serveTask);
+gulp.task(serveBuildTask);
+gulp.task(gulpCompileEs6Task);
+gulp.task(gulpCompileTsTask);
+gulp.task(buildTask);
+gulp.task(testTask);
+gulp.task(e2eTask);
+gulp.task('webdriver:update', webDriverMngrUpdateTask);

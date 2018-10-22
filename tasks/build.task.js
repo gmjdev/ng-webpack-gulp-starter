@@ -7,14 +7,14 @@ import {
     LogUtil
 } from '../util/util';
 import {
-    appProgram
+    AppProgram
 } from '../config/app.config.options';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export function build(done) {
-    var env = appProgram.validateAndGetEnvironment(appConfig.environment);
+function build(done) {
+    var env = AppProgram.validateAndGetEnvironment(appConfig.environment);
     const webPkEnv = appConfig.environment.prod === env ? 'prod' : 'dev';
     var config = require('../config/webpack.' + webPkEnv + '.config').config;
     LogUtil.info('build', 'Building Application for environment: ' + env);
@@ -29,3 +29,11 @@ export function build(done) {
         done();
     });
 }
+
+let buildTask = build;
+buildTask.displayName = 'build';
+buildTask.description = 'buildTask description';
+
+export {
+    buildTask
+};

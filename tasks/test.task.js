@@ -2,17 +2,13 @@
 
 import path from 'path';
 import {
-    IoUtil,
     LogUtil
 } from '../util/util';
 import {
     Server
 } from 'karma';
 
-const cwd = process.cwd();
-const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
-
-export default function test(done) {
+function test(done) {
     LogUtil.info('test', 'Running Unit testing for application...');
     const server = new Server({
         configFile: path.join(cwd, 'config', 'test', 'karma.conf.js'),
@@ -36,3 +32,11 @@ export default function test(done) {
         done();
     });
 }
+
+let testTask = test;
+testTask.displayName = 'test:junit';
+testTask.description = 'test:junit description';
+
+export {
+    testTask,
+};

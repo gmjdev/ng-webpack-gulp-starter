@@ -12,13 +12,10 @@ export class AppProgram {
     }
 
     static validateAndGetEnvironment(environments) {
-        const localPrgm = this.initializeAppOptions();
+        const localPrgm = AppProgram.initializeAppOptions();
         localPrgm.parse(process.argv);
-        console.log('----------->' + localPrgm.env);
         const env = localPrgm.env ? localPrgm.env : process.env.NODE_ENV;
-        console.log('----------->env' + env);
         const env2 = IoUtil.validateEnvironment(environments, env);
-        console.log('----------->env' + env2);
         return env2;
     }
 }

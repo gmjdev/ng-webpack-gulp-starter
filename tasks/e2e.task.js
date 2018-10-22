@@ -9,14 +9,14 @@ import SocketIoUtil from '../util/socketIo.util';
 import {
     protractor
 } from 'gulp-protractor'
-import gulpCompileEs6 from './gulp-compile-es6';
+import gulpCompileEs6 from './gulp-compile-es6.task';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-export const webDriverMngrUpdate = protractor.webdriver_update;
+const webDriverMngrUpdate = protractor.webdriver_update;
 
-export function e2e(done) {
+function e2e(done) {
     LogUtil.info('e2e', 'Starting End to End application testing....');
     const configFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.configFile);
     const e2eTsConfigFileLoc = path.join(cwd, 'config', 'test', appConfig.test.e2e.tsConfigFile);
@@ -59,4 +59,15 @@ export function e2e(done) {
             // SocketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         });
+};
+
+let e2eTask = e2e;
+e2eTask.displayName = 'test:e2e';
+e2eTask.description = 'test:e2e description';
+
+let webDriverMngrUpdateTask = webDriverMngrUpdate;
+
+export {
+    e2eTask,
+    webDriverMngrUpdateTask
 };
