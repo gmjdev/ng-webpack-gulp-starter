@@ -18,7 +18,7 @@
  * BROWSER POLYFILLS
  */
 
-// IE9, IE10 and IE11 requires all of the following polyfills. 
+// IE9, IE10 and IE11 requires all of the following polyfills.
 import 'core-js/es6/array';
 import 'core-js/es6/date';
 import 'core-js/es6/function';
@@ -75,6 +75,6 @@ import 'zone.js/dist/zone'; // Included with Angular CLI.
  */
 if (false) {
 } else {
-  Error['stackTraceLimit'] = Infinity;
-  // import 'zone.js/dist/long-stack-trace-zone';
+    Error['stackTraceLimit'] = Infinity;
+    // import 'zone.js/dist/long-stack-trace-zone';
 }

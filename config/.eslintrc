@@ -2,6 +2,40 @@
     "extends": "eslint:recommended",
     "rules": {
         "semi": ["error", "always"],
-        "quotes": ["error", "single"]
+        "quotes": ["error", "single"],
+        "curly": ["error", "all"],
+        "consistent-return": ["error", {
+            "treatUndefinedAsUnspecified": true
+        }],
+        "complexity": ["error", 15],
+        "default-case": "error",
+        "eqeqeq": "error",
+        "no-eq-null": "error",
+        "no-invalid-this": "error",
+        "strict": "error",
+        "no-shadow": "error",
+        "no-shadow-restricted-names": "error",
+        "init-declarations": "error",
+        "camelcase": "error",
+        "comma-spacing": "error",
+        "comma-style": "error",
+        "indent": "error",
+        "max-len": ["error", {
+            "code": 100
+        }],
+        "max-lines-per-function": ["error", {
+            "max": 80,
+            "skipBlankLines": true,
+            "skipComments": true
+        }],
+        "max-nested-callbacks": ["error", 3]
+    },
+    "env": {
+        "browser": true,
+        "node": true,
+        "jasmine": true,
+        "protractor": true,
+        "jquery": true,
+        "es6": true
     }
 }

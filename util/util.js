@@ -11,6 +11,7 @@ import * as _ from 'lodash';
 import {
     glob
 } from 'glob';
+import mkdirp from 'mkdirp'
 
 const cwd = process.cwd();
 const webDriverMngr = {
@@ -175,6 +176,21 @@ class IoUtil {
 
     static getCssFiles(options) {
         return getFilesForGlobPattern(['**/*.css'], options);
+    }
+
+    static writeFile(filePath, data, charset = 'utf8') {
+        const parentDir = path.dirname(filePath);
+        if (!fs.existsSync(parentDir)) {
+            mkdirp.sync(parentDir, (err) => {
+                if (err) {
+                    throw new Error('Unable to create directory: ' + err);
+                }
+            });
+        }
+        fs.writeFileSync(filePath, data, {
+            encoding: charset,
+            flag: 'w'
+        });
     }
 }
 

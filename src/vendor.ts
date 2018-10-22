@@ -7,4 +7,5 @@ import '@angular/platform-browser-dynamic';
 import '@angular/router';
 
 // RxJS
+/* tslint:disable:import-blacklist */
 import 'rxjs';

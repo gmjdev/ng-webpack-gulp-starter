@@ -31,6 +31,11 @@
         "jsPattern": "js/[name].[hash:8].js",
         "cssPattern": "css/[name].[hash:8].css"
     },
+    "lint": {
+        "report": {
+            "reportDir": "lint"
+        }
+    },
     "test": {
         "report": {
             "junitDir": "junit",
