@@ -35,7 +35,7 @@ function test(done) {
 
 let testTask = test;
 testTask.displayName = 'test:junit';
-testTask.description = 'test:junit description';
+testTask.description = 'Run unit test spec for application';
 
 export {
     testTask,

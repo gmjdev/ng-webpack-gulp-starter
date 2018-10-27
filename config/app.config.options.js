@@ -15,7 +15,6 @@ export class AppProgram {
         const localPrgm = AppProgram.initializeAppOptions();
         localPrgm.parse(process.argv);
         const env = localPrgm.env ? localPrgm.env : process.env.NODE_ENV;
-        const env2 = IoUtil.validateEnvironment(environments, env);
-        return env2;
+        return IoUtil.validateEnvironment(environments, env);
     }
 }

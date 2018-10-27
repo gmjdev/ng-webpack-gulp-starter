@@ -46,11 +46,11 @@ function esLint() {
 
 let tsLintTask = tsLint;
 tsLintTask.displayName = 'lint:ts';
-tsLintTask.description = 'lint:ts description';
+tsLintTask.description = 'Performs source code analysis for *.ts files using tslint';
 
 let esLintTask = esLint;
 esLintTask.displayName = 'lint:es';
-esLintTask.description = 'lint:es description';
+esLintTask.description = 'Performs source code analysis for *.js files using eslint';
 
 export {
     tsLintTask,

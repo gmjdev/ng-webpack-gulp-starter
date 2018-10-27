@@ -2,7 +2,6 @@ import ioClient from 'socket.io-client';
 import ioServer from 'socket.io';
 
 export default class SocketIoUtil {
-
     static serverListenEvent(server, event, callback) {
         const socketIoServer = ioServer(server);
         socketIoServer.on('connection', function (socketServer) {

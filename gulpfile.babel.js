@@ -24,8 +24,23 @@ import {
     esLintTask
 } from './tasks/lint.task';
 import {
+    cleanDistTask,
+    cleanTmpTask,
+    cleanReportsTask
+} from './tasks/clean.task';
+import {
     LogUtil
 } from './util/util';
+
+/** Clean Tasks */
+const cleanAll = gulp.series(cleanTmpTask, cleanDistTask, cleanReportsTask);
+cleanAll.displayName = 'clean';
+cleanAll.description = 'Performs clean up process for temporary and generated files';
+gulp.task(cleanAll);
+gulp.task(cleanTmpTask);
+gulp.task(cleanDistTask);
+gulp.task(cleanReportsTask);
+
 
 /** Serve Tasks */
 gulp.task(serveTask);
@@ -38,7 +53,7 @@ gulp.task(gulpCompileTsTask);
 /** Lint Tasks */
 const lintAll = gulp.series(esLintTask, tsLintTask);
 lintAll.displayName = 'lint';
-lintAll.description = 'Performs lint process for all files';
+lintAll.description = 'Performs Source code analysis';
 gulp.task(lintAll);
 gulp.task(esLintTask);
 gulp.task(tsLintTask);

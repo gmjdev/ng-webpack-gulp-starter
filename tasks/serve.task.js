@@ -68,11 +68,11 @@ function serve() {
 
 let serveTask = serve;
 serveTask.displayName = 'serve';
-serveTask.description = 'serve description';
+serveTask.description = 'Build and serve content via Web browser with live reload feature';
 
 let serveBuildTask = serveBuild;
 serveBuildTask.displayName = 'serve:build';
-serveBuildTask.description = 'serve:build description';
+serveBuildTask.description = 'Serve already generated application based on current environment variable';
 
 export {
     serveTask,

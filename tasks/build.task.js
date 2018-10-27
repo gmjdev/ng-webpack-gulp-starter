@@ -30,7 +30,7 @@ function build(done) {
 
 let buildTask = build;
 buildTask.displayName = 'build';
-buildTask.description = 'buildTask description';
+buildTask.description = 'Build the application for distribution and deployment purpose';
 
 export {
     buildTask

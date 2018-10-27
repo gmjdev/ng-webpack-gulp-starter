@@ -10,7 +10,13 @@
         "reportsDir": "reports",
         "assetsDir": "assets",
         "tasksDir": "tasks",
-        "tempDir": "tmp"
+        "tempDir": "tmp",
+        "jsFiles": [
+            "src/**/*.js",
+            "!node_modules/**/*",
+            "!dist/**/*",
+            "!tmp/**/*"
+        ]
     },
     "banner": {
         "content": ["Hello",
@@ -36,12 +42,15 @@
             "reportDir": "lint"
         },
         "esLint": {
-            "files": ["**/*.js", "!node_modules/**", "!dist/**"],
+            "files": ["**/*.js", "!node_modules/**", "!dist/**", "!tmp/**/*"],
             "htmlReport": "eslint-report.html",
             "xmlReport": "eslint-report.xml"
         },
         "tsLint": {
-            "files": ["**/*.ts", "!node_modules/**", "!dist/**"],
+            "files": ["**/*.ts",
+                "!node_modules/**", "!dist/**", "!tmp/**/*",
+                "!**/*.html", "!**/*.scss", "!**/*.css"
+            ],
             "xmlReport": "tslint-report.xml"
         }
     },
@@ -57,10 +66,11 @@
             "specFile": [
                 "**/e2e/*.e2e.ts"
             ],
+            "htmlReportTitle": "Application E2E Test Result",
             "browser": "chrome",
-            "htmlReportFileName": "app.e2e",
+            "htmlReportFileName": "app.e2e-report.html",
             "configFile": "protractor.conf.js",
-            "junitFilePrefix": "app-junit-e2e-",
+            "junitFilePrefix": "app-e2e-junit.xml",
             "tsConfigFile": "tsconfig.e2e.json",
             "baseUrl": "http://localhost:4200/"
         },

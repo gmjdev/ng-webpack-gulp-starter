@@ -19,7 +19,7 @@
         "camelcase": "error",
         "comma-spacing": "error",
         "comma-style": "error",
-        "indent": "error",
+        "indent": ["error", 4],
         "max-len": ["error", {
             "code": 100
         }],
