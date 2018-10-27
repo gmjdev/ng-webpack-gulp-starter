@@ -7,7 +7,7 @@ export class AppProgram {
     static initializeAppOptions() {
         program
             .version('0.0.1')
-            .option('-e, --env [env]', 'Specify environment option', 'development')
+            .option('-e, --env [env]', 'Specify environment option', 'development');
         return program;
     }
 

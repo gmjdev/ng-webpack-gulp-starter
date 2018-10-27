@@ -1,5 +1,3 @@
-"use strict";
-
 import path from 'path';
 import {
     LogUtil
@@ -7,6 +5,8 @@ import {
 import {
     Server
 } from 'karma';
+
+const cwd = process.cwd();
 
 function test(done) {
     LogUtil.info('test', 'Running Unit testing for application...');

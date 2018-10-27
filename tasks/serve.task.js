@@ -10,8 +10,7 @@ import {
 import opn from 'opn';
 import {
     AppProgram
-}
-from '../config/app.config.options';
+} from '../config/app.config.options';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));

@@ -34,6 +34,15 @@
     "lint": {
         "report": {
             "reportDir": "lint"
+        },
+        "esLint": {
+            "files": ["**/*.js", "!node_modules/**", "!dist/**"],
+            "htmlReport": "eslint-report.html",
+            "xmlReport": "eslint-report.xml"
+        },
+        "tsLint": {
+            "files": ["**/*.ts", "!node_modules/**", "!dist/**"],
+            "xmlReport": "tslint-report.xml"
         }
     },
     "test": {
@@ -45,11 +54,15 @@
             "lcovonlyFileName": "lcovonly.txt"
         },
         "e2e": {
-            "specFile": "e2e/**/*.e2e.ts",
+            "specFile": [
+                "**/e2e/*.e2e.ts"
+            ],
+            "browser": "chrome",
             "htmlReportFileName": "app.e2e",
             "configFile": "protractor.conf.js",
             "junitFilePrefix": "app-junit-e2e-",
-            "tsConfigFile": "tsconfig.e2e.json"
+            "tsConfigFile": "tsconfig.e2e.json",
+            "baseUrl": "http://localhost:4200/"
         },
         "junit": {
             "frameworks": ["jasmine"],

@@ -1,5 +1,3 @@
-'use strict';
-
 import path from 'path';
 import CleanWebpackPlugin from 'clean-webpack-plugin';
 import merge from 'webpack-merge';

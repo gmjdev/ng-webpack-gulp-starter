@@ -1,5 +1,3 @@
-'use-strict';
-
 import ioClient from 'socket.io-client';
 import ioServer from 'socket.io';
 
@@ -9,7 +7,7 @@ export default class SocketIoUtil {
         const socketIoServer = ioServer(server);
         socketIoServer.on('connection', function (socketServer) {
             socketServer.on(event, function () {
-                callback.apply(this, arguments);
+                callback.apply(arguments);
             });
         });
     }
@@ -26,7 +24,7 @@ export default class SocketIoUtil {
         const socketClient = ioClient.connect(url);
         socketClient.on('connect', function () {
             socketClient.emit(event);
-            callback.apply(this, arguments);
+            callback.apply(arguments);
         });
     }
-};
+}

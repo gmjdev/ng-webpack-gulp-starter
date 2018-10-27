@@ -1,63 +1,59 @@
-'use strict';
-
 import chalk from 'chalk';
 import fs from 'fs';
 import path from 'path';
 import {
-    spawn,
-    spawnSync
+    spawn
 } from 'child_process';
 import * as _ from 'lodash';
 import {
     glob
 } from 'glob';
-import mkdirp from 'mkdirp'
+import mkdirp from 'mkdirp';
 
 const cwd = process.cwd();
-const webDriverMngr = {
-    seleniumDriver: 'Selenium standalone version available',
-    chromeDriver: 'chromedriver version available'
-};
 const _root = path.resolve(__dirname, '..');
 
-class LogUtil {
-    static error(msg) {
-        console.log(chalk.redBright(msg));
-    }
 
+class LogUtil {
+    /* eslint-disable no-console */
     static error(task, msg) {
-        console.log(chalk.redBright(`[${task}] `) + msg);
+        if (arguments.length === 1) {
+            console.log(chalk.redBright(msg));
+        } else {
+            console.log(chalk.redBright(`[${arguments[0]}] `) + arguments[1]);
+        }
     }
 
     static success(msg) {
-        console.log(chalk.green(msg));
-    }
-
-    static success(task, msg) {
-        console.log(chalk.green(`[${task}] `) + msg);
+        if (arguments.length === 1) {
+            console.log(chalk.green(msg));
+        } else {
+            console.log(chalk.green(`[${arguments[0]}] `) + arguments[1]);
+        }
     }
 
     static warning(msg) {
-        console.log(chalk.red(msg));
-    }
-
-    static warning(task, msg) {
-        console.log(chalk.red(`[${task}] `) + msg);
+        if (arguments.length === 1) {
+            console.log(chalk.red(msg));
+        } else {
+            console.log(chalk.red(`[${arguments[0]}] `) + arguments[1]);
+        }
     }
 
     static info(msg) {
-        console.log(chalk.yellowBright(msg));
+        if (arguments.length === 1) {
+            console.log(chalk.yellowBright(msg));
+        } else {
+            console.log(chalk.yellowBright(`[${arguments[0]}] `) + arguments[1]);
+        }
     }
-
-    static info(task, msg) {
-        console.log(chalk.yellowBright(`[${task}] `) + msg);
-    }
+    /* eslint-enable no-console */
 }
 
 class IoUtil {
     static readFile(filePath, charset) {
         if (!fs.existsSync(filePath)) {
-            throw new Error("File does not exists: " + filePath);
+            throw new Error('File does not exists: ' + filePath);
         }
         return fs.readFileSync(filePath, charset || 'utf8');
     }
@@ -74,13 +70,18 @@ class IoUtil {
 
     static parseArguments(argument) {
         let arg = {},
-            a, opt, thisOpt, curOpt;
-        for (a = 0; a < argument.length; a++) {
+            a = 0,
+            opt = '',
+            thisOpt = '',
+            curOpt = '';
+        for (; a < argument.length; a++) {
             thisOpt = argument[a].trim();
-            opt = thisOpt.replace(/^\-+/, '');
+            opt = thisOpt.replace(/^-+/, '');
 
             if (opt === thisOpt) {
-                if (curOpt) arg[curOpt] = opt;
+                if (curOpt) {
+                    arg[curOpt] = opt;
+                }
                 curOpt = null;
             } else {
                 curOpt = opt;
@@ -99,7 +100,8 @@ class IoUtil {
 
         if (!exists) {
             throw new Error(chalk.red('Unsupported environment is specified, ' +
-                'please specify valid environments from: ') + chalk.green(JSON.stringify(validEnv)));
+                    'please specify valid environments from: ') +
+                chalk.green(JSON.stringify(validEnv)));
         }
         return exists;
     }
@@ -137,12 +139,12 @@ class IoUtil {
         return process.argv.join('').indexOf(flag) > -1;
     }
 
-    static mkDirIfNotExists(path) {
-        console.log('Checking path exists or not ...');
-        fs.stat(path, function (err, stats) {
+    static mkDirIfNotExists(dir) {
+        LogUtil.info('Checking path exists or not ...');
+        fs.stat(dir, function (err) {
             if (err) {
-                console.log('Provided path does not exists creating it : ' + path);
-                fs.mkdirSync(path);
+                LogUtil.error('Provided path does not exists creating it : ' + dir);
+                fs.mkdirSync(dir);
             }
         });
     }
@@ -158,7 +160,7 @@ class IoUtil {
                 pattern = pattern.slice(1);
             }
             // Find all matching files for this pattern.
-            var matches = _globSync(pattern, options);
+            var matches = IoUtil.globSync(pattern, options);
             if (exclusion) {
                 // If an exclusion, remove matching files.
                 result = _.difference(result, matches);
@@ -171,11 +173,11 @@ class IoUtil {
     }
 
     static getJsFiles(options) {
-        return getFilesForGlobPattern(['**/*.js'], options);
+        return IoUtil.getFilesForGlobPattern(['**/*.js'], options);
     }
 
     static getCssFiles(options) {
-        return getFilesForGlobPattern(['**/*.css'], options);
+        return IoUtil.getFilesForGlobPattern(['**/*.css'], options);
     }
 
     static writeFile(filePath, data, charset = 'utf8') {
@@ -191,6 +193,10 @@ class IoUtil {
             encoding: charset,
             flag: 'w'
         });
+    }
+
+    static globSync(pattern, options) {
+        return glob.sync(pattern, options);
     }
 }
 
@@ -242,7 +248,7 @@ class Util {
 
     static prependString(itemToSuffix, strToPrepend) {
         if (arguments.length !== 2) {
-            return;
+            return '';
         }
         if (_.isArray(itemToSuffix)) {
             return _.map(itemToSuffix, function (item) {
@@ -263,7 +269,7 @@ class Util {
     static runSpawn(done, task, optArg, optIo) {
         optArg = typeof optArg !== 'undefined' ? optArg : [];
         let processResponse = {};
-        let child;
+        let child = {};
         let running = false;
         let stdio = 'inherit';
         if (optIo !== 'undefined') {
@@ -275,7 +281,7 @@ class Util {
             child = spawn(task, optArg);
             let response = [];
             child.stdout.on('data', function (data) {
-                console.log('data' + data);
+                LogUtil.info('Data ${data}');
                 response.push(data);
             });
             processResponse.stdOut = response;
@@ -287,17 +293,17 @@ class Util {
             processResponse.stdErr = errResponse;
         }
 
-        child.on('close', function () {
-            console.log('Process Close');
+        child.on('close', () => {
+            LogUtil.info('Process Close');
             if (!running) {
                 running = true;
                 done();
             }
         });
-        child.on('error', function () {
-            console.log('An error has occurred while executing process');
+        child.on('error', () => {
+            LogUtil.info('An error has occurred while executing process');
             if (!running) {
-                console.error('Encountered a child error');
+                LogUtil.error('Encountered a child error');
                 running = true;
                 done();
             }

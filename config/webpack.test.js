@@ -1,5 +1,3 @@
-'use-strict';
-
 import path from 'path';
 import {
     IoUtil
@@ -19,7 +17,7 @@ export const webpackTestConfig = {
     resolve: {
         extensions: appConfig.source.allowedExtension,
         modules: [
-            "node_modules",
+            'node_modules',
             path.join(cwd, appConfig.source.srcDir)
         ],
     },
@@ -40,7 +38,9 @@ export const webpackTestConfig = {
             loaders: [{
                 loader: 'awesome-typescript-loader?inlineSourceMap=true&sourceMap=false',
                 options: {
-                    configFileName: path.join(cwd, appConfig.source.srcDir, appConfig.source.appSpecTsConfig)
+                    configFileName: path.join(cwd,
+                        appConfig.source.srcDir,
+                        appConfig.source.appSpecTsConfig)
                 }
             }, 'angular2-template-loader'],
             exclude: [/\.e2e\.ts$/, /node_modules/]

@@ -1,5 +1,3 @@
-"use strict";
-
 import CleanWebpackPlugin from 'clean-webpack-plugin';
 import merge from 'webpack-merge';
 import {
@@ -9,7 +7,7 @@ import path from 'path';
 import {
     IoUtil
 } from '../util/util';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+// import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
 
 const cwd = process.cwd();

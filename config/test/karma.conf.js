@@ -26,8 +26,6 @@ export default function (config) {
             '../../src/test.ts': appConfig.test.junit.preprocessors
         },
 
-        files: appConfig.test.junit.files,
-
         failOnEmptyTestSuite: false,
 
         webpack: webpackTestConfig,
@@ -91,4 +89,4 @@ export default function (config) {
         browsers: appConfig.test.junit.browsers,
         singleRun: appConfig.test.junit.singleRun
     });
-};
+}

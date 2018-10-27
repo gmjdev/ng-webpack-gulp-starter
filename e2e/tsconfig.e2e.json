@@ -1,7 +1,7 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../config/tsconfig.json",
   "compilerOptions": {
-    "outDir": "../../dist/tsc/e2e",
+    "outDir": "../dist/tsc/e2e",
     "baseUrl": "./",
     "sourceMap": false,
     "removeComments": false,

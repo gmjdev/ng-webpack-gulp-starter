@@ -16,7 +16,7 @@ export default class ProtractorUtil {
 
     static isSeleniumServerAndDriverAvailable() {
         let available = false;
-        console.log('Checking selenium server and driver files are available.');
+        // console.log('Checking selenium server and driver files are available.');
         return available;
     }
 

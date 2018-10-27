@@ -30,6 +30,9 @@
         }],
         "max-nested-callbacks": ["error", 3]
     },
+    "parserOptions": {
+        "sourceType": "module"
+    },
     "env": {
         "browser": true,
         "node": true,

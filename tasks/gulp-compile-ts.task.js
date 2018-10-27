@@ -1,5 +1,3 @@
-"use strict";
-
 import path from 'path';
 import gulp from 'gulp';
 import ts from 'gulp-typescript';
@@ -12,7 +10,7 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-function gulpCompileTs(tsConfig, files) {
+function gulpCompileTs(tsConfig, files, done) {
     if (!IoUtil.fileExists(tsConfig)) {
         LogUtil.error('compile:ts',
             'Provided typescript configuration file does not exists "' +
@@ -38,7 +36,8 @@ function gulpCompileTs(tsConfig, files) {
     }
 
     if (!IoUtil.fileExists(e2eTsConfigFileLoc)) {
-        LogUtil.error('compile:ts', 'Protractor typescript configuration file does not exists on path: "' +
+        LogUtil.error('compile:ts',
+            'Protractor typescript configuration file does not exists on path: "' +
             e2eTsConfigFileLoc + '"');
         throw new Error('Missing Protractor Typescript configuration :(');
     }
@@ -50,13 +49,14 @@ function gulpCompileTs(tsConfig, files) {
         .pipe(protractor({
             configFile: configFileLoc
         }))
-        .on('end', function (e) {
+        .on('end', () => {
             LogUtil.info('e2e', 'Completed End to End application testing successfully :) !!!');
             // socketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         })
         .on('error', function (e) {
             LogUtil.error('e2e', 'Completed End to End application with error :(');
+            LogUtil.error('e2e', 'Error: ' + e.toString());
             //socketIoUtil.emitEvent(url, 'asyncComplete');
             done();
         });

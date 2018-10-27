@@ -1,50 +1,68 @@
+/* eslint-disable indent */
 import {
   SpecReporter
-}
-from 'jasmine-spec-reporter';
-import ProtractorUtil from '../util/protractor.util';
+} from 'jasmine-spec-reporter';
+import {
+  LogUtil,
+  IoUtil
+} from '../util/util';
+import path from 'path';
+import {
+  JUnitXmlReporter
+} from 'jasmine-reporters';
+import HtmlReporter from 'protractor-beautiful-reporter';
 
-// const webDriverMngrPath = path.resolve(cwd, './node_modules/webdriver-manager');
-// const seleniumServerJarLocation = ProtractorUtil.findSeleniumJarPath(webDriverMngrPath);
-// seleniumServerJarLocation = './' + path.relative(__dirname, seleniumServerJarLocation);
+const cwd = process.cwd();
+const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
+const e2eReportPath = path.join(cwd, appConfig.source.buildDir, appConfig.source.reportsDir, 'e2e');
 
-export const config = {
+const reporters = [
+  new SpecReporter({
+    spec: {
+      displayStacktrace: true
+    }
+  }),
+  new JUnitXmlReporter({
+    consolidateAll: true,
+    savePath: e2eReportPath,
+    filePrefix: 'e2e-results'
+  }),
+  new HtmlReporter({
+    baseDirectory: path.join(e2eReportPath, 'html'),
+    screenshotsSubfolder: 'screenshots',
+    excludeSkippedSpecs: false,
+    takeScreenShotsOnlyForFailedSpecs: true,
+    docName: appConfig.test.e2e.htmlReportFileName
+  }).getJasmine2Reporter()
+];
+
+const protractorConfig = {
   allScriptsTimeout: 11000,
-  // seleniumServerJar: seleniumServerJarLocation,
-  specs: [
-    'C:\source\ng-webpack-gulp-starter\**\*.e2e.ts'
-  ],
+  specs: appConfig.test.e2e.specFile,
   capabilities: {
-    'browserName': 'chrome',
+    'browserName': appConfig.test.e2e.browser,
     chromeOptions: {
       binary: process.env.CHROME_BIN,
       args: ['--no-sandbox']
     }
   },
-
   directConnect: true,
-
-  baseUrl: 'http://localhost:4200/',
-
-  framework: 'jasmine',
-
+  baseUrl: appConfig.test.e2e.baseUrl,
+  framework: 'jasmine2',
   jasmineNodeOpts: {
     showTiming: true,
     showColors: true,
     isVerbose: false,
     includeStackTrace: false,
     defaultTimeoutInterval: 60000,
-    print: (msg) => console.log(msg),
+    print: (msg) => LogUtil.info(msg),
   },
-
   onPrepare() {
     require('ts-node').register({
-      project: 'e2e/tsconfig.e2e.json'
+      project: path.join(cwd, appConfig.source.e2eDir, appConfig.test.e2e.tsConfigFile)
     });
-    jasmine.getEnv().addReporter(new SpecReporter({
-      spec: {
-        displayStacktrace: true
-      }
-    }));
+    reporters.forEach((value) => jasmine.getEnv().addReporter(value));
   }
 };
+
+export const config = protractorConfig;

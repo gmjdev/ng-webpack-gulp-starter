@@ -30,6 +30,94 @@ function processBanner() {
     return compiled(data);
 }
 
+/* eslint-disable indent */
+const webpackRules = [{
+        test: /\.html$/,
+        loader: 'html-loader',
+        options: {
+            minimize: true,
+            removeAttributeQuotes: false,
+            collapseWhitespace: true,
+            caseSensitive: true,
+            customAttrSurround: [
+                [/#/, /(?:)/],
+                [/\*/, /(?:)/],
+                [/\[?\(?/, /(?:)/]
+            ],
+            customAttrAssign: [/\)?\]?=/]
+        }
+    },
+    {
+        test: /\.ts$/,
+        loaders: [{
+            loader: 'awesome-typescript-loader',
+            options: {
+                configFileName: path.join(cwd, appConfig.source.srcDir,
+                    appConfig.source.appTsConfig)
+            }
+        }, 'angular2-template-loader'],
+        exclude: [/\.(spec|e2e)\.ts$/]
+    },
+    {
+        test: /\.txt$/,
+        use: 'raw-loader'
+    },
+    {
+        test: /\.s?[ac]ss$/,
+        use: [
+            'to-string-loader',
+            MiniCssExtractPlugin.loader,
+            {
+                loader: 'css-loader',
+                options: {
+                    url: false,
+                    sourceMap: true
+                }
+            },
+            {
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true
+                }
+            }
+        ],
+    },
+    {
+        test: /\.(png|svg|jpg|gif)$/,
+        use: [{
+            loader: 'file-loader'
+        }]
+    },
+    {
+        test: /\.(woff|woff2|eot|ttf|otf)$/,
+        use: [
+            'file-loader'
+        ]
+    },
+    {
+        test: /\.(csv|tsv)$/,
+        use: [
+            'csv-loader'
+        ]
+    },
+    {
+        test: /\.xml$/,
+        use: [
+            'xml-loader'
+        ]
+    },
+    {
+        test: /\.ejs$/,
+        loader: 'ejs-loader'
+    },
+    {
+        test: /\.js$/,
+        exclude: /node_modules/,
+        loader: 'babel-loader'
+    },
+];
+/* eslint-enable indent */
+
 export const WebPackCommonConfig = {
     entry: {
         polyfills: ['./src/polyfills.ts'],
@@ -38,7 +126,7 @@ export const WebPackCommonConfig = {
     },
     resolve: {
         modules: [
-            "node_modules",
+            'node_modules',
             path.resolve(__dirname, appConfig.source.srcDir)
         ],
         extensions: appConfig.source.allowedExtension
@@ -74,7 +162,6 @@ export const WebPackCommonConfig = {
     devServer: {
         compress: true,
         port: appConfig.server.port || 9000,
-        compress: true,
         clientLogLevel: 'info',
         historyApiFallback: true,
         hot: true,
@@ -82,91 +169,7 @@ export const WebPackCommonConfig = {
         proxy: appConfig.server.proxy || {}
     },
     module: {
-        rules: [{
-                test: /\.html$/,
-                loader: 'html-loader',
-                options: {
-                    minimize: true,
-                    removeAttributeQuotes: false,
-                    collapseWhitespace: true,
-                    caseSensitive: true,
-                    customAttrSurround: [
-                        [/#/, /(?:)/],
-                        [/\*/, /(?:)/],
-                        [/\[?\(?/, /(?:)/]
-                    ],
-                    customAttrAssign: [/\)?\]?=/]
-                }
-            },
-            {
-                test: /\.ts$/,
-                loaders: [{
-                    loader: 'awesome-typescript-loader',
-                    options: {
-                        configFileName: path.join(cwd, appConfig.source.srcDir,
-                            appConfig.source.appTsConfig)
-                    }
-                }, 'angular2-template-loader'],
-                exclude: [/\.(spec|e2e)\.ts$/]
-            },
-            {
-                test: /\.txt$/,
-                use: 'raw-loader'
-            },
-            {
-                test: /\.s?[ac]ss$/,
-                use: [
-                    'to-string-loader',
-                    MiniCssExtractPlugin.loader,
-                    {
-                        loader: 'css-loader',
-                        options: {
-                            url: false,
-                            sourceMap: true
-                        }
-                    },
-                    {
-                        loader: 'sass-loader',
-                        options: {
-                            sourceMap: true
-                        }
-                    }
-                ],
-            },
-            {
-                test: /\.(png|svg|jpg|gif)$/,
-                use: [{
-                    loader: 'file-loader'
-                }]
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/,
-                use: [
-                    'file-loader'
-                ]
-            },
-            {
-                test: /\.(csv|tsv)$/,
-                use: [
-                    'csv-loader'
-                ]
-            },
-            {
-                test: /\.xml$/,
-                use: [
-                    'xml-loader'
-                ]
-            },
-            {
-                test: /\.ejs$/,
-                loader: 'ejs-loader'
-            },
-            {
-                test: /\.js$/,
-                exclude: /node_modules/,
-                loader: 'babel-loader'
-            },
-        ]
+        rules: webpackRules
     },
     plugins: [
         new webpack.AutomaticPrefetchPlugin(),
@@ -189,7 +192,7 @@ export const WebPackCommonConfig = {
         ]),
         new LiveReloadPlugin({
             appendScriptTag: true,
-            protocol: appConfig.server.https ? "https" : "http",
+            protocol: appConfig.server.https ? 'https' : 'http',
             hostname: appConfig.server.host
         }),
         new webpack.ContextReplacementPlugin(

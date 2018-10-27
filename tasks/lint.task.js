@@ -1,10 +1,8 @@
-'use strict';
-
 import {
     src
 } from 'gulp';
 import eslint from 'gulp-eslint';
-import tslint from "gulp-tslint";
+import tslint from 'gulp-tslint';
 import path from 'path';
 import {
     IoUtil,
@@ -18,29 +16,29 @@ const baseDir = path.join(cwd, appConfig.source.buildDir, appConfig.source.repor
 
 function tsLint() {
     const tsLintOpt = {
-        formatter: "stylish"
+        formatter: 'stylish'
     };
     const tsLintReportOpt = {
         summarizeFailureOutput: true
     };
-    return src(['src/**/*.ts', '!node_modules/**'])
+    return src(appConfig.lint.tsLint.files)
         .pipe(tslint(tsLintOpt))
         .pipe(tslint.report(tsLintReportOpt));
 }
 
-function jsLint() {
+function esLint() {
     LogUtil.info('eslint', 'Perfoming linting process...');
-    return src(['src/**/*.js', '!node_modules/**'])
+    return src(appConfig.lint.esLint.files)
         .pipe(eslint({
             configFile: path.join(cwd, 'config', '.eslintrc')
         }))
         .pipe(eslint.format('html', (results) =>
             IoUtil.writeFile(
-                path.join(baseDir, 'html', 'eslint-report.html'),
+                path.join(baseDir, 'html', appConfig.lint.esLint.htmlReport),
                 results)))
         .pipe(eslint.format('jslint-xml', (results) =>
             IoUtil.writeFile(
-                path.join(baseDir, 'xml', 'eslint-report.xml'),
+                path.join(baseDir, 'xml', appConfig.lint.esLint.xmlReport),
                 results)))
         .pipe(eslint.format())
         .pipe(eslint.failAfterError());
@@ -50,11 +48,11 @@ let tsLintTask = tsLint;
 tsLintTask.displayName = 'lint:ts';
 tsLintTask.description = 'lint:ts description';
 
-let jsLintTask = jsLint;
-jsLintTask.displayName = 'lint:js';
-jsLintTask.description = 'lint:js description';
+let esLintTask = esLint;
+esLintTask.displayName = 'lint:es';
+esLintTask.description = 'lint:es description';
 
 export {
     tsLintTask,
-    jsLintTask
+    esLintTask
 };

@@ -1,5 +1,3 @@
-'use strict';
-
 import gulp from 'gulp';
 import {
     e2eTask,
@@ -23,16 +21,34 @@ import {
 } from './tasks/test.task';
 import {
     tsLintTask,
-    jsLintTask
+    esLintTask
 } from './tasks/lint.task';
+import {
+    LogUtil
+} from './util/util';
 
+/** Serve Tasks */
 gulp.task(serveTask);
 gulp.task(serveBuildTask);
+
+/** Compile Tasks */
 gulp.task(gulpCompileEs6Task);
 gulp.task(gulpCompileTsTask);
-gulp.task(jsLintTask);
+
+/** Lint Tasks */
+const lintAll = gulp.series(esLintTask, tsLintTask);
+lintAll.displayName = 'lint';
+lintAll.description = 'Performs lint process for all files';
+gulp.task(lintAll);
+gulp.task(esLintTask);
 gulp.task(tsLintTask);
+
+/** Build Tasks */
 gulp.task(buildTask);
+
+/** Test Tasks */
 gulp.task(testTask);
-gulp.task(e2eTask);
-gulp.task('webdriver:update', webDriverMngrUpdateTask);
+const e2eTestTask = gulp.series(webDriverMngrUpdateTask, e2eTask);
+e2eTestTask.displayName = 'test:e2e';
+e2eTestTask.description = 'Performs E2E Testing of application';
+gulp.task(e2eTestTask);
