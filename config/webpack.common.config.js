@@ -8,6 +8,9 @@ import webpack from 'webpack';
 import LiveReloadPlugin from 'webpack-livereload-plugin';
 import TSLintPlugin from 'tslint-webpack-plugin';
 import {
+    AngularCompilerPlugin
+} from '@ngtools/webpack';
+import {
     BundleAnalyzerPlugin
 } from 'webpack-bundle-analyzer';
 import CompressionPlugin from 'compression-webpack-plugin';
@@ -35,7 +38,7 @@ const webpackRules = [{
         test: /\.html$/,
         loader: 'html-loader',
         options: {
-            minimize: true,
+            minimize: false,
             removeAttributeQuotes: false,
             collapseWhitespace: true,
             caseSensitive: true,
@@ -48,14 +51,15 @@ const webpackRules = [{
         }
     },
     {
-        test: /\.ts$/,
-        loaders: [{
-            loader: 'awesome-typescript-loader',
-            options: {
-                configFileName: path.join(cwd, appConfig.source.srcDir,
-                    appConfig.source.appTsConfig)
-            }
-        }, 'angular2-template-loader'],
+        test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+        use: [{
+                loader: '@angular-devkit/build-optimizer/webpack-loader',
+                options: {
+                    sourceMap: false
+                }
+            },
+            '@ngtools/webpack'
+        ],
         exclude: [/\.(spec|e2e)\.ts$/]
     },
     {
@@ -63,10 +67,19 @@ const webpackRules = [{
         use: 'raw-loader'
     },
     {
-        test: /\.s?[ac]ss$/,
+        test: /\.css$/,
         use: [
-            'to-string-loader',
             MiniCssExtractPlugin.loader,
+            'css-loader',
+        ]
+    },
+    {
+        test: /\.s[ac]ss$/,
+        use: [
+            // 'css-loader', // translates CSS into CommonJS
+            // 'sass-loader' // compiles Sass to CSS, using Node Sass by defaul
+            'to-string-loader',
+            // MiniCssExtractPlugin.loader,
             {
                 loader: 'css-loader',
                 options: {
@@ -83,16 +96,8 @@ const webpackRules = [{
         ],
     },
     {
-        test: /\.(png|svg|jpg|gif)$/,
-        use: [{
-            loader: 'file-loader'
-        }]
-    },
-    {
-        test: /\.(woff|woff2|eot|ttf|otf)$/,
-        use: [
-            'file-loader'
-        ]
+        test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
+        use: ['file-loader?name=assets/[name].[hash].[ext]']
     },
     {
         test: /\.(csv|tsv)$/,
@@ -113,7 +118,7 @@ const webpackRules = [{
     {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: 'babel-loader'
+        use: ['babel-loader']
     },
 ];
 /* eslint-enable indent */
@@ -126,8 +131,8 @@ export const WebPackCommonConfig = {
     },
     resolve: {
         modules: [
-            'node_modules',
-            path.resolve(__dirname, appConfig.source.srcDir)
+            path.join(cwd, 'node_modules'),
+            path.join(cwd, appConfig.source.srcDir)
         ],
         extensions: appConfig.source.allowedExtension
     },
@@ -172,6 +177,13 @@ export const WebPackCommonConfig = {
         rules: webpackRules
     },
     plugins: [
+        new AngularCompilerPlugin({
+            tsConfigPath: path.join(cwd, appConfig.source.srcDir,
+                appConfig.source.appTsConfig),
+            mainPath: '../src/main.ts',
+            sourceMap: true,
+            skipCodeGeneration: true
+        }),
         new webpack.AutomaticPrefetchPlugin(),
         new webpack.BannerPlugin({
             banner: processBanner(),
@@ -208,8 +220,7 @@ export const WebPackCommonConfig = {
         }),
         new MiniCssExtractPlugin({
             filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css'
-        }),
-        new TSLintPlugin({
+        }), new TSLintPlugin({
             files: ['./src/**/*.ts']
         })
     ]
