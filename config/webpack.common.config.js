@@ -52,14 +52,7 @@ const webpackRules = [{
     },
     {
         test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
-        use: [{
-                loader: '@angular-devkit/build-optimizer/webpack-loader',
-                options: {
-                    sourceMap: false
-                }
-            },
-            '@ngtools/webpack'
-        ],
+        use: ['@ngtools/webpack'],
         exclude: [/\.(spec|e2e)\.ts$/]
     },
     {
@@ -180,7 +173,10 @@ export const WebPackCommonConfig = {
         new AngularCompilerPlugin({
             tsConfigPath: path.join(cwd, appConfig.source.srcDir,
                 appConfig.source.appTsConfig),
-            mainPath: '../src/main.ts',
+            mainPath: path.join(cwd, appConfig.source.srcDir,
+                'main.ts'),
+            entryModule: path.join(cwd, appConfig.source.srcDir, appConfig.source.appDir,
+                'app.module#AppModule'),
             sourceMap: true,
             skipCodeGeneration: true
         }),
