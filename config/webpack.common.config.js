@@ -18,9 +18,11 @@ import {
     _
 } from 'lodash';
 import * as moment from 'moment';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
+const srcDirPath = path.join(cwd, appConfig.source.srcDir);
 
 function processBanner() {
     const data = {
@@ -62,31 +64,33 @@ const webpackRules = [{
     {
         test: /\.css$/,
         use: [
-            MiniCssExtractPlugin.loader,
-            'css-loader',
-        ]
+            'style-loader',
+            'css-loader'
+        ],
     },
     {
-        test: /\.s[ac]ss$/,
+        test: /\.scss$/,
         use: [
-            // 'css-loader', // translates CSS into CommonJS
-            // 'sass-loader' // compiles Sass to CSS, using Node Sass by defaul
-            'to-string-loader',
             // MiniCssExtractPlugin.loader,
-            {
-                loader: 'css-loader',
-                options: {
-                    url: false,
-                    sourceMap: true
-                }
-            },
+            'style-loader',
+            'to-string-loader',
+            // {
+            //     loader: 'css-loader',
+            //     options: {
+            //         url: false,
+            //         sourceMap: true
+            //     }
+            // },
             {
                 loader: 'sass-loader',
                 options: {
-                    sourceMap: true
+                    sourceMap: true,
+                    includePaths: [
+                        path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
+                    ]
                 }
             }
-        ],
+        ]
     },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
@@ -94,15 +98,11 @@ const webpackRules = [{
     },
     {
         test: /\.(csv|tsv)$/,
-        use: [
-            'csv-loader'
-        ]
+        loader: 'csv-loader'
     },
     {
         test: /\.xml$/,
-        use: [
-            'xml-loader'
-        ]
+        loader: 'xml-loader'
     },
     {
         test: /\.ejs$/,
@@ -111,7 +111,7 @@ const webpackRules = [{
     {
         test: /\.js$/,
         exclude: /node_modules/,
-        use: ['babel-loader']
+        loader: 'babel-loader'
     },
 ];
 /* eslint-enable indent */
@@ -125,7 +125,7 @@ export const WebPackCommonConfig = {
     resolve: {
         modules: [
             path.join(cwd, 'node_modules'),
-            path.join(cwd, appConfig.source.srcDir)
+            srcDirPath
         ],
         extensions: appConfig.source.allowedExtension
     },
@@ -158,11 +158,8 @@ export const WebPackCommonConfig = {
         ]
     },
     devServer: {
-        compress: true,
-        port: appConfig.server.port || 9000,
         clientLogLevel: 'info',
-        historyApiFallback: true,
-        hot: true,
+        port: appConfig.server.port || 9000,
         https: appConfig.server.https || false,
         proxy: appConfig.server.proxy || {}
     },
@@ -170,6 +167,7 @@ export const WebPackCommonConfig = {
         rules: webpackRules
     },
     plugins: [
+        new webpack.HashedModuleIdsPlugin(),
         new AngularCompilerPlugin({
             tsConfigPath: path.join(cwd, appConfig.source.srcDir,
                 appConfig.source.appTsConfig),
@@ -180,6 +178,7 @@ export const WebPackCommonConfig = {
             sourceMap: true,
             skipCodeGeneration: true
         }),
+        new HardSourceWebpackPlugin(),
         new webpack.AutomaticPrefetchPlugin(),
         new webpack.BannerPlugin({
             banner: processBanner(),
@@ -198,11 +197,11 @@ export const WebPackCommonConfig = {
             path.join(cwd, appConfig.source.tasksDir),
             path.join(cwd, appConfig.source.buildDir)
         ]),
-        new LiveReloadPlugin({
-            appendScriptTag: true,
-            protocol: appConfig.server.https ? 'https' : 'http',
-            hostname: appConfig.server.host
-        }),
+        // new LiveReloadPlugin({
+        //     appendScriptTag: true,
+        //     protocol: appConfig.server.https ? 'https' : 'http',
+        //     hostname: appConfig.server.host
+        // }),
         new webpack.ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)@angular/,
             IoUtil.root('./src'), // location of your src
@@ -214,10 +213,13 @@ export const WebPackCommonConfig = {
             xhtml: true,
             data: appConfig.indexHtml
         }),
-        new MiniCssExtractPlugin({
-            filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css'
-        }), new TSLintPlugin({
-            files: ['./src/**/*.ts']
-        })
+        // new MiniCssExtractPlugin({
+        //     cache: false,
+        //     filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css',
+        //     chunkFilename: '[id].css'
+        // }),
+        // new TSLintPlugin({
+        //     files: ['./src/**/*.ts']
+        // })
     ]
 };

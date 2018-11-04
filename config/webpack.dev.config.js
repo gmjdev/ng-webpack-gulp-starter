@@ -12,7 +12,7 @@ import {
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-let pathsToClean = [appConfig.source.buildDir, appConfig.environment.dev];
+let pathsToClean = [appConfig.environment.dev];
 
 let cleanOptions = {
     root: path.resolve(cwd, appConfig.source.buildDir),
@@ -37,7 +37,10 @@ export const config = merge(WebPackCommonConfig, {
         ],
         publicPath: appConfig.server.path,
         open: true,
-        openPage: '/'
+        openPage: '/',
+        historyApiFallback: true,
+        hot: true,
+        compress: true,
     },
     plugins: [
         new webpack.DefinePlugin({
@@ -46,6 +49,7 @@ export const config = merge(WebPackCommonConfig, {
             }
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
-        new webpack.HotModuleReplacementPlugin()
+        new webpack.HotModuleReplacementPlugin(),
+        new webpack.NoEmitOnErrorsPlugin()
     ],
 });
