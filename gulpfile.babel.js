@@ -31,6 +31,9 @@ import {
 import {
     LogUtil
 } from './util/util';
+import {
+    watchFolders
+} from './tasks/watch.task';
 
 /** Clean Tasks */
 const cleanAll = gulp.series(cleanTmpTask, cleanDistTask, cleanReportsTask);
@@ -41,9 +44,18 @@ gulp.task(cleanTmpTask);
 gulp.task(cleanDistTask);
 gulp.task(cleanReportsTask);
 
+/** Watch Tasks */
+let watchTask = () => watchFolders.apply('src/**/*.html', ['serve']);
+watchTask.displayName = 'watch:src';
+watchTask.description = 'watch files for changes...';
+gulp.task(watchTask);
 
 /** Serve Tasks */
-gulp.task(serveTask);
+// gulp.task(serveTask);
+let serveTsk = gulp.parallel(serveTask, [watchTask])
+serveTsk.displayName = serveTask.displayName;
+serveTsk.description = serveTask.description;
+gulp.task(serveTsk);
 gulp.task(serveBuildTask);
 
 /** Compile Tasks */

@@ -1,0 +1,9 @@
+{
+    "map": false,
+    "plugins": {
+        "postcss-plugin": false,
+        "postcss-cssnext": false,
+        "autoprefixer": {},
+        "cssnano": false
+    }
+}

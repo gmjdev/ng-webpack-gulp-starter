@@ -7,7 +7,7 @@ import path from 'path';
 import {
     IoUtil
 } from '../util/util';
-// import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import webpack from 'webpack';
 
 const cwd = process.cwd();
@@ -35,6 +35,11 @@ export const config = merge(WebPackCommonConfig, {
                 'NODE_ENV': appConfig.environment.prod
             }
         }),
-        new CleanWebpackPlugin(pathsToClean, cleanOptions)
+        new CleanWebpackPlugin(pathsToClean, cleanOptions),
+        new MiniCssExtractPlugin({
+            cache: false,
+            filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css',
+            chunkFilename: '[id].css'
+        }),
     ],
 });

@@ -46,13 +46,13 @@ function serve() {
     const compiler = webpack(webPackConfig);
     const app = express();
     app.use(middleware(compiler, {
-        noInfo: false,
+        noInfo: true,
         hot: webPackConfig.devServer.hot,
         publicPath: webPackConfig.output.publicPath,
         stats: {
             colors: true
         },
-        logLevel: 'info',
+        logLevel: 'warn',
         overlay: {
             warnings: false,
             errors: true

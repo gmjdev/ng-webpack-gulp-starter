@@ -4,6 +4,7 @@ import {
     IoUtil
 } from '../util/util';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import ExtractCssChunks from 'extract-css-chunks-webpack-plugin';
 import webpack from 'webpack';
 import LiveReloadPlugin from 'webpack-livereload-plugin';
 import TSLintPlugin from 'tslint-webpack-plugin';
@@ -23,6 +24,7 @@ import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const srcDirPath = path.join(cwd, appConfig.source.srcDir);
+const configDir = path.join(cwd, 'config');
 
 function processBanner() {
     const data = {
@@ -61,26 +63,36 @@ const webpackRules = [{
         test: /\.txt$/,
         use: 'raw-loader'
     },
+    // {
+    //     test: /\.css$/,
+    //     use: [
+    //         MiniCssExtractPlugin.loader,
+    //         'css-loader'
+    //     ],
+    // },
     {
-        test: /\.css$/,
+        test: /\.(scss|css)$/,
         use: [
-            'style-loader',
-            'css-loader'
-        ],
-    },
-    {
-        test: /\.scss$/,
-        use: [
-            // MiniCssExtractPlugin.loader,
-            'style-loader',
             'to-string-loader',
+            ExtractCssChunks.loader,
+            // 'style-loader',
+            {
+                loader: 'css-loader',
+                options: {
+                    url: false,
+                    sourceMap: true,
+                    importLoaders: 1
+                }
+            },
             // {
-            //     loader: 'css-loader',
+            //     loader: 'postcss-loader',
             //     options: {
-            //         url: false,
-            //         sourceMap: true
+            //         config: {
+            //             path: configDir
+            //         }
             //     }
             // },
+            // 'resolve-url-loader',
             {
                 loader: 'sass-loader',
                 options: {
@@ -135,7 +147,7 @@ export const WebPackCommonConfig = {
         publicPath: appConfig.server.path
     },
     optimization: {
-        minimize: false,
+        minimize: true,
         splitChunks: {
             name: true,
             cacheGroups: {
@@ -158,7 +170,7 @@ export const WebPackCommonConfig = {
         ]
     },
     devServer: {
-        clientLogLevel: 'info',
+        clientLogLevel: 'none',
         port: appConfig.server.port || 9000,
         https: appConfig.server.https || false,
         proxy: appConfig.server.proxy || {}
@@ -178,7 +190,14 @@ export const WebPackCommonConfig = {
             sourceMap: true,
             skipCodeGeneration: true
         }),
-        new HardSourceWebpackPlugin(),
+        // new HardSourceWebpackPlugin([{
+        //     // HardSource works with mini-css-extract-plugin but due to how
+        //     // mini-css emits assets, assets are not emitted on repeated builds with
+        //     // mini-css and hard-source together. Ignoring the mini-css loader
+        //     // modules, but not the other css loader modules, excludes the modules
+        //     // that mini-css needs rebuilt to output assets every time.
+        //     test: /mini-css-extract-plugin[\\/]dist[\\/]loader/,
+        // }]),
         new webpack.AutomaticPrefetchPlugin(),
         new webpack.BannerPlugin({
             banner: processBanner(),
@@ -218,6 +237,18 @@ export const WebPackCommonConfig = {
         //     filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css',
         //     chunkFilename: '[id].css'
         // }),
+        new ExtractCssChunks({
+            // Options similar to the same options in webpackOptions.output
+            // both options are optional
+            filename: '[name].css',
+            chunkFilename: '[id].css',
+            hot: true, // if you want HMR - we try to automatically inject hot 
+            //reloading but if it's not working, add it to the config
+            orderWarning: true, // Disable to remove warnings 
+            //about conflicting order between imports
+            reloadAll: true, // when desperation kicks in - this is a brute force HMR flag
+            cssModules: true // if you use cssModules, this can help.
+        }),
         // new TSLintPlugin({
         //     files: ['./src/**/*.ts']
         // })
