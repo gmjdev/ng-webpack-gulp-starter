@@ -53,8 +53,9 @@ gulp.task(watchTask);
 /** Serve Tasks */
 // gulp.task(serveTask);
 let serveTsk = gulp.parallel(serveTask, [watchTask])
-serveTsk.displayName = serveTask.displayName;
-serveTsk.description = serveTask.description;
+serveTsk.displayName = serveTask.displayName + ':watch';
+serveTsk.description = serveTask.description + ' with watch';
+gulp.task(serveTask);
 gulp.task(serveTsk);
 gulp.task(serveBuildTask);
 

@@ -22,7 +22,7 @@ let cleanOptions = {
 
 export const config = merge(WebPackCommonConfig, {
     mode: 'development',
-    devtool: 'inline-source-map',
+    devtool: 'cheap-module-eval-source-map',
     entry: {
         client: [
             'webpack-hot-middleware/client?reload=true'

@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   templateUrl: 'app.component.html',
 })
 export class AppComponent {
-  title = 'Tour of Heroes sss';
+  title = 'Tour of Heroes sssc hellow world sss';
 
   test() {
     console.log('hello from test');
