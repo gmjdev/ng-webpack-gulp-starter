@@ -15,7 +15,7 @@ import {
     _
 } from 'lodash';
 import * as moment from 'moment';
-// import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 import ProgressPlugin from 'webpack/lib/ProgressPlugin';
 
@@ -23,7 +23,6 @@ import ProgressPlugin from 'webpack/lib/ProgressPlugin';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const srcDirPath = path.join(cwd, appConfig.source.srcDir);
-const configDir = path.join(cwd, 'config');
 
 function processBanner() {
     const data = {
@@ -70,38 +69,47 @@ const webpackRules = [{
     },
     {
         test: /\.css$/,
-        use: ['to-string-loader', 'css-loader'],
-        include: [path.join(srcDirPath, appConfig.source.appDir)]
-    },
-    {
-        test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
-        exclude: [path.join(srcDirPath, appConfig.source.appDir)]
-    },
-    {
-        test: /\.scss$/,
-        use: [
-            'to-string-loader',
+        loaders: [{
+                loader: 'to-string-loader'
+            },
             {
                 loader: 'css-loader',
                 options: {
-                    url: false,
-                    sourceMap: true,
-                    importLoaders: 1
-                }
-            },
-            {
-                loader: 'sass-loader',
-                options: {
-                    sourceMap: true,
-                    includePaths: [
-                        path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
-                    ]
+                    sourceMap: true
                 }
             }
-        ],
-        include: [srcDirPath]
+        ]
+        // include: [path.join(srcDirPath, appConfig.source.appDir)]
     },
+    // {
+    //     test: /\.css$/,
+    //     use: ['style-loader', 'css-loader'],
+    //     exclude: [path.join(srcDirPath, appConfig.source.appDir)]
+    // },
+    // {
+    //     test: /\.scss$/,
+    //     use: [
+    //         'to-string-loader',
+    //         {
+    //             loader: 'css-loader',
+    //             options: {
+    //                 url: false,
+    //                 sourceMap: true,
+    //                 importLoaders: 1
+    //             }
+    //         },
+    //         {
+    //             loader: 'sass-loader',
+    //             options: {
+    //                 sourceMap: true,
+    //                 includePaths: [
+    //                     path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
+    //                 ]
+    //             }
+    //         }
+    //     ],
+    //     include: [srcDirPath]
+    // },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
         use: ['file-loader?name=assets/[name].[hash].[ext]']
@@ -153,23 +161,11 @@ export const WebPackCommonConfig = {
     },
     optimization: {
         minimize: false,
-        splitChunks: {
-            name: true,
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendor',
-                    chunks: 'initial'
-                },
-                default: {
-                    reuseExistingChunk: true
-                }
-            }
-        }
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false,
     },
     watchOptions: {
-        aggregateTimeout: 300,
-        poll: 1000,
         ignored: [
             'node_modules',
             appConfig.source.tasksDir,
@@ -187,6 +183,14 @@ export const WebPackCommonConfig = {
         rules: webpackRules
     },
     plugins: [
+        new HardSourceWebpackPlugin({
+            environmentHash: {
+                root: process.cwd(),
+                directories: [],
+                files: ['package-lock.json'],
+            },
+        }),
+        new webpack.NamedModulesPlugin(),
         new webpack.AutomaticPrefetchPlugin(),
         new webpack.HashedModuleIdsPlugin(),
         new AngularCompilerPlugin({

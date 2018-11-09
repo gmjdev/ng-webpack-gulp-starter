@@ -58,7 +58,12 @@ function serve() {
             errors: true
         },
     }));
-    app.use(hotMiddleware(compiler));
+
+    if (appConfig.server.hmr) {
+        LogUtil.info('serv', 'Using HMR with webpack');
+        app.use(hotMiddleware(compiler));
+    }
+
     app.listen(webPackConfig.devServer.port, () => {
         const url = buildUrl();
         LogUtil.info('serve', `Open your browser if it is not already opened @ ${url}`);

@@ -20,14 +20,9 @@ let cleanOptions = {
     dry: false
 };
 
-export const config = merge(WebPackCommonConfig, {
+let devConfiguration = {
     mode: 'development',
     devtool: 'cheap-module-eval-source-map',
-    entry: {
-        client: [
-            'webpack-hot-middleware/client?reload=true'
-        ]
-    },
     output: {
         path: path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev)
     },
@@ -39,7 +34,7 @@ export const config = merge(WebPackCommonConfig, {
         open: true,
         openPage: '/',
         historyApiFallback: true,
-        hot: true,
+        hot: appConfig.server.hmr,
         compress: true,
     },
     plugins: [
@@ -49,7 +44,16 @@ export const config = merge(WebPackCommonConfig, {
             }
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
-        new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin()
     ],
-});
+};
+
+if (appConfig.server.hmr) {
+    devConfiguration.entry = {};
+    devConfiguration.entry.client = [
+        'webpack-hot-middleware/client?reload=true'
+    ];
+    devConfiguration.plugins.push(new webpack.HotModuleReplacementPlugin());
+}
+
+export const config = merge(WebPackCommonConfig, devConfiguration);

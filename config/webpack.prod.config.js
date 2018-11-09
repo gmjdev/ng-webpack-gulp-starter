@@ -13,7 +13,7 @@ import webpack from 'webpack';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
-let pathsToClean = [appConfig.source.buildDir, appConfig.environment.prod];
+let pathsToClean = [appConfig.environment.prod];
 
 let cleanOptions = {
     root: path.resolve(cwd, appConfig.source.buildDir),
@@ -27,7 +27,20 @@ export const config = merge(WebPackCommonConfig, {
         path: path.resolve(cwd, appConfig.source.buildDir, appConfig.environment.prod)
     },
     optimization: {
-        minimize: true
+        minimize: true,
+        splitChunks: {
+            name: true,
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    chunks: 'initial'
+                },
+                default: {
+                    reuseExistingChunk: true
+                }
+            }
+        }
     },
     plugins: [
         new webpack.DefinePlugin({

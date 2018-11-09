@@ -99,7 +99,8 @@
         "proxy": {
             "/api": "http://localhost:3000"
         },
-        "path": "/"
+        "path": "/",
+        "hmr": true
     },
     "environments": {
         "dev": "development",
