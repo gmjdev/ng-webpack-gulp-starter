@@ -6,7 +6,9 @@ import {
 } from './webpack.common.config';
 import webpack from 'webpack';
 import {
-    IoUtil
+    IoUtil,
+    Util,
+    LogUtil
 } from '../util/util';
 
 const cwd = process.cwd();
@@ -61,9 +63,15 @@ let devConfiguration = {
 if (appConfig.server.hmr) {
     devConfiguration.entry = {};
     devConfiguration.entry.hmrClient = [
-        'webpack/hot/only-dev-server',
         'webpack-hot-middleware/client?reload=true'
     ];
+    Object.keys(devConfiguration.entry).map(e => {
+        if (Util.isArray(devConfiguration.entry[e])) {
+            LogUtil.info('Adding HMR entry for entry point: ' + e);
+            devConfiguration.entry[e].push(
+                'webpack-hot-middleware/client?reload=true');
+        }
+    });
     devConfiguration.plugins.push(new webpack.HotModuleReplacementPlugin());
 }
 

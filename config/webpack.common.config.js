@@ -20,6 +20,7 @@ import CircularDependencyPlugin from 'circular-dependency-plugin';
 import ProgressPlugin from 'webpack/lib/ProgressPlugin';
 import autoprefixer from 'autoprefixer';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -43,7 +44,9 @@ const cssLoader = {
     loader: 'css-loader',
     options: {
         url: false,
-        sourceMap: true
+        sourceMap: true,
+        modules: true,
+        localIdentName: '[name]__[local]___[hash:base64:5]'
     }
 };
 const sassLoader = {
@@ -59,8 +62,7 @@ const postCssLoader = {
         sourceMap: true,
         plugins: () => [
             autoprefixer()
-        ],
-        options: {},
+        ]
     }
 };
 
@@ -86,24 +88,27 @@ const webpackRules = [{
         use: ['@ngtools/webpack'],
         exclude: [/\.(spec|e2e)\.ts$/]
     },
-    // {
-    //     test: /\.js$/,
-    //     exclude: /(ngfactory|ngstyle).js$/,
-    //     enforce: 'pre',
-    //     use: 'source-map-loader'
-    // },
+    {
+        test: /\.js$/,
+        exclude: /(ngfactory|ngstyle).js$/,
+        enforce: 'pre',
+        use: 'source-map-loader'
+    },
     {
         test: /\.txt$/,
         use: 'raw-loader'
     },
     {
         test: /\.css$/,
-        use: ['to-string-loader'].concat(postCssLoader),
+        use: [postCssLoader],
         include: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
         test: /\.css$/,
-        use: ['style-loader', 'css-loader'],
+        use: ExtractTextPlugin.extract({
+            fallback: 'style-loader',
+            use: [cssLoader, postCssLoader]
+        }),
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
@@ -278,11 +283,11 @@ export const WebPackCommonConfig = {
             path.join(cwd, appConfig.source.tasksDir),
             path.join(cwd, appConfig.source.buildDir)
         ]),
-        new LiveReloadPlugin({
-            appendScriptTag: true,
-            protocol: appConfig.server.https ? 'https' : 'http',
-            hostname: appConfig.server.host
-        }),
+        // new LiveReloadPlugin({
+        //     appendScriptTag: true,
+        //     protocol: appConfig.server.https ? 'https' : 'http',
+        //     hostname: appConfig.server.host
+        // }),
         new webpack.ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)@angular/,
             /\/@angular(\\|\/)core(\\|\/)fesm5/,
@@ -294,6 +299,7 @@ export const WebPackCommonConfig = {
             title: appConfig.indexHtml.title,
             xhtml: true,
             data: appConfig.indexHtml
-        })
+        }),
+        new ExtractTextPlugin('[name].css'),
     ]
 };
