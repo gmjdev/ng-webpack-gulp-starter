@@ -29,7 +29,8 @@
     },
     "assets": {
         "fonts": [
-            "node_modules\\angular-bootstrap-md\\font"
+            "node_modules\\angular-bootstrap-md\\font",
+            "node_modules\\@fortawesome\\fontawesome-free\\webfonts"
         ],
         "images": [
             "node_modules\\angular-bootstrap-md\\img"

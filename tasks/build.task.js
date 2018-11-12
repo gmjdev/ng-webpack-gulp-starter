@@ -17,10 +17,21 @@ function build(done) {
     var config = require('../config/webpack.' + webPkEnv + '.config').config;
     LogUtil.info('build', 'Building Application for environment: ' + env);
 
-    if (config.entry && config.entry.hmrClient) {
-        LogUtil.info('build', 'Removing HMR client entry from webpack ' +
-            'configuration ');
-        delete config.entry['hmrClient'];
+    if (appConfig.server.hmr) {
+        Object.keys(config.entry).forEach(e => {
+            if (Util.isArray(config.entry[e]) &&
+                (e === 'main' || e === 'app')) {
+                let noHmr = [];
+                LogUtil.info('Removing HMR entry for entry point: ' + e);
+                config.entry[e].forEach(item => {
+                    if (item !== 'webpack-hot-middleware/client?reload=true') {
+                        noHmr.push(item);
+                    }
+                });
+                LogUtil.info('Removed HMR entry for entry point successfully');
+                config.entry[e] = noHmr;
+            }
+        });
     }
 
     if (config.watchOptions) {

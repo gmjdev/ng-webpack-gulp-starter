@@ -1,3 +1,8 @@
 $roboto-font-path: "assets/font/roboto/";
+$fa-font-path: "assets/font/";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/brands";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~@fortawesome/fontawesome-free/scss/regular";
 @import "~angular-bootstrap-md/scss/bootstrap/bootstrap";
 @import "~angular-bootstrap-md/scss/mdb-free";

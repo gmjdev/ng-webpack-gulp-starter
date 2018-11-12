@@ -4,7 +4,6 @@ import {
     IoUtil
 } from '../util/util';
 import webpack from 'webpack';
-import LiveReloadPlugin from 'webpack-livereload-plugin';
 import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
@@ -40,15 +39,6 @@ function processBanner() {
     return compiled(data);
 }
 
-const cssLoader = {
-    loader: 'css-loader',
-    options: {
-        url: false,
-        sourceMap: true,
-        modules: true,
-        localIdentName: '[name]__[local]___[hash:base64:5]'
-    }
-};
 const sassLoader = {
     loader: 'fast-sass-loader',
     options: {
@@ -95,10 +85,6 @@ const webpackRules = [{
         use: 'source-map-loader'
     },
     {
-        test: /\.txt$/,
-        use: 'raw-loader'
-    },
-    {
         test: /\.css$/,
         use: [postCssLoader],
         include: [path.join(srcDirPath, appConfig.source.appDir)]
@@ -107,37 +93,23 @@ const webpackRules = [{
         test: /\.css$/,
         use: ExtractTextPlugin.extract({
             fallback: 'style-loader',
-            use: [cssLoader, postCssLoader]
+            use: [postCssLoader]
         }),
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
         test: /\.scss$|\.sass$/,
-        use: ['to-string-loader',
-            postCssLoader,
-            sassLoader
-        ],
+        use: [postCssLoader, sassLoader],
         include: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
         test: /\.scss$|\.sass$/,
-        use: ['style-loader',
-            cssLoader,
-            sassLoader
-        ],
+        use: ['style-loader', postCssLoader, sassLoader],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
         use: ['file-loader?name=assets/[name].[hash].[ext]']
-    },
-    {
-        test: /\.(csv|tsv)$/,
-        loader: 'csv-loader'
-    },
-    {
-        test: /\.xml$/,
-        loader: 'xml-loader'
     },
     {
         test: /\.ejs$/,
@@ -242,7 +214,7 @@ export const WebPackCommonConfig = {
     plugins: [
         new CopyWebpackPlugin(assets),
         new HardSourceWebpackPlugin({
-            cacheDirectory: path.join(srcDirPath, 'cache'),
+            cacheDirectory: path.join(cwd, 'cache'),
             environmentHash: {
                 root: process.cwd(),
                 directories: [],
