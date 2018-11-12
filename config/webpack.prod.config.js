@@ -24,29 +24,14 @@ let cleanOptions = {
 export const config = merge(WebPackCommonConfig, {
     mode: 'production',
     output: {
-        path: path.resolve(cwd, appConfig.source.buildDir, appConfig.environment.prod)
-    },
-    optimization: {
-        minimize: true,
-        splitChunks: {
-            name: true,
-            cacheGroups: {
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                    name: 'vendor',
-                    chunks: 'initial'
-                },
-                default: {
-                    reuseExistingChunk: true
-                }
-            }
-        }
-    },
+        path: path.resolve(cwd, appConfig.source.buildDir,
+            appConfig.environment.prod)
+    },    
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': {
+            'process.env': JSON.stringify({
                 'NODE_ENV': appConfig.environment.prod
-            }
+            })
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new MiniCssExtractPlugin({
@@ -54,5 +39,6 @@ export const config = merge(WebPackCommonConfig, {
             filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css',
             chunkFilename: '[id].css'
         }),
+        new webpack.NoEmitOnErrorsPlugin()
     ],
 });

@@ -26,7 +26,8 @@ import {
 import {
     cleanDistTask,
     cleanTmpTask,
-    cleanReportsTask
+    cleanReportsTask,
+    cleanCacheTask
 } from './tasks/clean.task';
 import {
     LogUtil
@@ -36,11 +37,12 @@ import {
 } from './tasks/watch.task';
 
 /** Clean Tasks */
-const cleanAll = gulp.series(cleanTmpTask, cleanDistTask, cleanReportsTask);
+const cleanAll = gulp.series(cleanTmpTask, cleanCacheTask, cleanDistTask, cleanReportsTask);
 cleanAll.displayName = 'clean';
 cleanAll.description = 'Performs clean up process for temporary and generated files';
 gulp.task(cleanAll);
 gulp.task(cleanTmpTask);
+gulp.task(cleanCacheTask);
 gulp.task(cleanDistTask);
 gulp.task(cleanReportsTask);
 
@@ -51,12 +53,15 @@ watchTask.description = 'watch files for changes...';
 gulp.task(watchTask);
 
 /** Serve Tasks */
-// gulp.task(serveTask);
 let serveTsk = gulp.parallel(serveTask, [watchTask])
 serveTsk.displayName = serveTask.displayName + ':watch';
 serveTsk.description = serveTask.description + ' with watch';
 gulp.task(serveTask);
-gulp.task(serveTsk);
+
+let serveTskWithClean = gulp.series(cleanAll, serveTask);
+serveTskWithClean.displayName = serveTask.displayName;
+serveTskWithClean.description = serveTask.description;
+gulp.task(serveTskWithClean);
 gulp.task(serveBuildTask);
 
 /** Compile Tasks */

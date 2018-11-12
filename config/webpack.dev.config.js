@@ -11,6 +11,7 @@ import {
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
+const destinationPath = path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev);
 
 let pathsToClean = [appConfig.environment.dev];
 
@@ -20,15 +21,24 @@ let cleanOptions = {
     dry: false
 };
 
+
 let devConfiguration = {
     mode: 'development',
     devtool: 'cheap-module-eval-source-map',
     output: {
-        path: path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev)
+        path: destinationPath
+    },
+    watchOptions: {
+        ignored: [
+            'node_modules',
+            appConfig.source.tasksDir,
+            appConfig.source.e2eDir,
+            appConfig.source.buildDir
+        ]
     },
     devServer: {
         contentBase: [
-            path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev)
+            destinationPath
         ],
         publicPath: appConfig.server.path,
         open: true,
@@ -39,9 +49,9 @@ let devConfiguration = {
     },
     plugins: [
         new webpack.DefinePlugin({
-            'process.env': {
+            'process.env': JSON.stringify({
                 'NODE_ENV': appConfig.environment.dev
-            }
+            })
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new webpack.NoEmitOnErrorsPlugin()
@@ -50,7 +60,8 @@ let devConfiguration = {
 
 if (appConfig.server.hmr) {
     devConfiguration.entry = {};
-    devConfiguration.entry.client = [
+    devConfiguration.entry.hmrClient = [
+        'webpack/hot/only-dev-server',
         'webpack-hot-middleware/client?reload=true'
     ];
     devConfiguration.plugins.push(new webpack.HotModuleReplacementPlugin());

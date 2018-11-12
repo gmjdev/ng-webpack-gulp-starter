@@ -4,13 +4,15 @@
         "appDir": "app",
         "e2eDir": "e2e",
         "buildDir": "dist",
-        "allowedExtension": [".ts", ".js", ".scss", ".css"],
+        "allowedExtension": [".ts", ".js"],
         "appTsConfig": "tsconfig.app.json",
         "appSpecTsConfig": "tsconfig.spec.json",
         "reportsDir": "reports",
         "assetsDir": "assets",
         "tasksDir": "tasks",
         "tempDir": "tmp",
+        "fontDir": "font",
+        "imagesDir": "images",
         "jsFiles": [
             "src/**/*.js",
             "!node_modules/**/*",
@@ -26,8 +28,12 @@
         ]
     },
     "assets": {
-        "font": "",
-        "images": ""
+        "fonts": [
+            "node_modules\\angular-bootstrap-md\\font"
+        ],
+        "images": [
+            "node_modules\\angular-bootstrap-md\\img"
+        ]
     },
     "environment": {
         "dev": "development",

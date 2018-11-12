@@ -16,16 +16,37 @@ function build(done) {
     const webPkEnv = appConfig.environment.prod === env ? 'prod' : 'dev';
     var config = require('../config/webpack.' + webPkEnv + '.config').config;
     LogUtil.info('build', 'Building Application for environment: ' + env);
-    webpack(config, (err, stats) => {
-        if (err) {
-            LogUtil.error('build', 'Unable to process build :(');
-            LogUtil.error('build', 'Error: ' + JSON.stringify(stats));
-        } else {
-            LogUtil.success('build', 'Building Application completed successfully :)');
-            LogUtil.info(stats.toString());
-        }
-        done();
-    });
+
+    if (config.entry && config.entry.hmrClient) {
+        LogUtil.info('build', 'Removing HMR client entry from webpack ' +
+            'configuration ');
+        delete config.entry['hmrClient'];
+    }
+
+    if (config.watchOptions) {
+        LogUtil.info('build', 'Removing watch options from webpack ' +
+            'configuration ');
+        delete config['watchOptions'];
+    }
+
+    if (config.devServer) {
+        LogUtil.info('build', 'Removing server config from webpack ' +
+            'configuration ');
+        delete config['devServer'];
+    }
+
+    return new Promise(resolve =>
+        webpack(config, (err, stats) => {
+            if (err) {
+                LogUtil.error('build', 'Unable to process build :(');
+                LogUtil.error('build', 'Error: ' + JSON.stringify(stats));
+            } else {
+                LogUtil.success('build', 'Building Application completed successfully :)');
+                LogUtil.info(stats.toString("errors-only"));
+            }
+            done();
+            resolve();
+        }));
 }
 
 let buildTask = build;

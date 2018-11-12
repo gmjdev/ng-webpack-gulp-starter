@@ -18,11 +18,15 @@ import * as moment from 'moment';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 import ProgressPlugin from 'webpack/lib/ProgressPlugin';
-
+import autoprefixer from 'autoprefixer';
+import CopyWebpackPlugin from 'copy-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const srcDirPath = path.join(cwd, appConfig.source.srcDir);
+const includePaths = [
+    path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
+];
 
 function processBanner() {
     const data = {
@@ -34,6 +38,31 @@ function processBanner() {
     const compiled = _.template(content);
     return compiled(data);
 }
+
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        url: false,
+        sourceMap: true
+    }
+};
+const sassLoader = {
+    loader: 'fast-sass-loader',
+    options: {
+        sourceMap: true,
+        'includePaths': includePaths
+    }
+};
+const postCssLoader = {
+    loader: 'postcss-loader',
+    options: {
+        sourceMap: true,
+        plugins: () => [
+            autoprefixer()
+        ],
+        options: {},
+    }
+};
 
 /* eslint-disable indent */
 const webpackRules = [{
@@ -57,59 +86,42 @@ const webpackRules = [{
         use: ['@ngtools/webpack'],
         exclude: [/\.(spec|e2e)\.ts$/]
     },
-    {
-        test: /\.js$/,
-        exclude: /(ngfactory|ngstyle).js$/,
-        enforce: 'pre',
-        use: 'source-map-loader'
-    },
+    // {
+    //     test: /\.js$/,
+    //     exclude: /(ngfactory|ngstyle).js$/,
+    //     enforce: 'pre',
+    //     use: 'source-map-loader'
+    // },
     {
         test: /\.txt$/,
         use: 'raw-loader'
     },
     {
         test: /\.css$/,
-        loaders: [{
-                loader: 'to-string-loader'
-            },
-            {
-                loader: 'css-loader',
-                options: {
-                    sourceMap: true
-                }
-            }
-        ]
-        // include: [path.join(srcDirPath, appConfig.source.appDir)]
+        use: ['to-string-loader'].concat(postCssLoader),
+        include: [path.join(srcDirPath, appConfig.source.appDir)]
     },
-    // {
-    //     test: /\.css$/,
-    //     use: ['style-loader', 'css-loader'],
-    //     exclude: [path.join(srcDirPath, appConfig.source.appDir)]
-    // },
-    // {
-    //     test: /\.scss$/,
-    //     use: [
-    //         'to-string-loader',
-    //         {
-    //             loader: 'css-loader',
-    //             options: {
-    //                 url: false,
-    //                 sourceMap: true,
-    //                 importLoaders: 1
-    //             }
-    //         },
-    //         {
-    //             loader: 'sass-loader',
-    //             options: {
-    //                 sourceMap: true,
-    //                 includePaths: [
-    //                     path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
-    //                 ]
-    //             }
-    //         }
-    //     ],
-    //     include: [srcDirPath]
-    // },
+    {
+        test: /\.css$/,
+        use: ['style-loader', 'css-loader'],
+        exclude: [path.join(srcDirPath, appConfig.source.appDir)]
+    },
+    {
+        test: /\.scss$|\.sass$/,
+        use: ['to-string-loader',
+            postCssLoader,
+            sassLoader
+        ],
+        include: [path.join(srcDirPath, appConfig.source.appDir)]
+    },
+    {
+        test: /\.scss$|\.sass$/,
+        use: ['style-loader',
+            cssLoader,
+            sassLoader
+        ],
+        exclude: [path.join(srcDirPath, appConfig.source.appDir)]
+    },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
         use: ['file-loader?name=assets/[name].[hash].[ext]']
@@ -136,11 +148,49 @@ const webpackRules = [{
         parser: {
             system: true
         },
+    },
+    {
+        test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
+        use: [{
+            loader: 'file-loader',
+            options: {
+                name: '[name].[ext]',
+                outputPath: 'fonts/'
+            }
+        }]
     }
 ];
 /* eslint-enable indent */
 
+let assets = [{
+    from: path.join(cwd, appConfig.source.srcDir, appConfig.source.assetsDir),
+    to: appConfig.source.assetsDir
+}];
+
+//copy fonts configured in config files
+if (appConfig.assets.fonts && appConfig.assets.fonts.length > 0) {
+    appConfig.assets.fonts.forEach((item) => {
+        assets.push({
+            from: item,
+            to: path.join(appConfig.source.assetsDir,
+                appConfig.source.fontDir)
+        });
+    });
+}
+
+//copy images configured in config files
+if (appConfig.assets.images && appConfig.assets.images.length > 0) {
+    appConfig.assets.images.forEach((item) => {
+        assets.push({
+            from: item,
+            to: path.join(appConfig.source.assetsDir,
+                appConfig.source.imagesDir)
+        });
+    });
+}
+
 export const WebPackCommonConfig = {
+    cache: false,
     entry: {
         polyfills: ['./src/polyfills.ts'],
         vendor: ['./src/vendor.ts'],
@@ -160,18 +210,20 @@ export const WebPackCommonConfig = {
         pathinfo: false
     },
     optimization: {
-        minimize: false,
-        removeAvailableModules: false,
-        removeEmptyChunks: false,
-        splitChunks: false,
-    },
-    watchOptions: {
-        ignored: [
-            'node_modules',
-            appConfig.source.tasksDir,
-            appConfig.source.e2eDir,
-            appConfig.source.buildDir
-        ]
+        minimize: true,
+        splitChunks: {
+            name: true,
+            cacheGroups: {
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                    name: 'vendor',
+                    chunks: 'initial'
+                },
+                default: {
+                    reuseExistingChunk: true
+                }
+            }
+        }
     },
     devServer: {
         clientLogLevel: 'none',
@@ -183,7 +235,9 @@ export const WebPackCommonConfig = {
         rules: webpackRules
     },
     plugins: [
+        new CopyWebpackPlugin(assets),
         new HardSourceWebpackPlugin({
+            cacheDirectory: path.join(srcDirPath, 'cache'),
             environmentHash: {
                 root: process.cwd(),
                 directories: [],

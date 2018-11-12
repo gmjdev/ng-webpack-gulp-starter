@@ -19,5 +19,11 @@
         "typeRoots": [
             "../node_modules/@types"
         ],
+    },
+    "angularCompilerOptions": {
+        "fullTemplateTypeCheck": true,
+        "preserveWhitespaces": true,
+        "genDir": "../dist/aot",
+        "skipMetadataEmit": true
     }
 }

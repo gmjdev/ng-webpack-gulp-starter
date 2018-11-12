@@ -35,6 +35,13 @@ function cleanReports() {
     return del([dir, exclude]);
 }
 
+function cleanCache() {
+    LogUtil.info('clean', 'Performing clean up task for cache directory ...');
+    const dir = path.join(cwd, 'cache') + '/**';
+    const exclude = '!' + dir.replace('/**', '');
+    return del([dir, exclude]);
+}
+
 let cleanTmpTask = cleanTmp;
 cleanTmpTask.displayName = 'clean:tmp';
 cleanTmpTask.description = 'Performs clean up process for temporary files';
@@ -47,8 +54,13 @@ let cleanReportsTask = cleanReports;
 cleanReportsTask.displayName = 'clean:reports';
 cleanReportsTask.description = 'Performs clean up process for reports files';
 
+let cleanCacheTask = cleanCache;
+cleanCacheTask.displayName = 'clean:cache';
+cleanCacheTask.description = 'Performs clean up process for cache files';
+
 export {
     cleanTmpTask,
     cleanDistTask,
-    cleanReportsTask
+    cleanReportsTask,
+    cleanCacheTask
 };
