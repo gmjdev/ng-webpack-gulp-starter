@@ -62,12 +62,9 @@ let devConfiguration = {
 
 if (appConfig.server.hmr) {
     devConfiguration.entry = {};
-    devConfiguration.entry.hmrClient = [
-        'webpack-hot-middleware/client?reload=true'
-    ];
-    Object.keys(devConfiguration.entry).map(e => {
+    Object.keys(devConfiguration.entry).forEach(e => {
+        LogUtil.info('Adding HMR entry for entry point: ' + e);
         if (Util.isArray(devConfiguration.entry[e])) {
-            LogUtil.info('Adding HMR entry for entry point: ' + e);
             devConfiguration.entry[e].push(
                 'webpack-hot-middleware/client?reload=true');
         }
