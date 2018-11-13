@@ -2,7 +2,8 @@ import path from 'path';
 import webpack from 'webpack';
 import {
     IoUtil,
-    LogUtil
+    LogUtil,
+    Util
 } from '../util/util';
 import {
     AppProgram
@@ -15,20 +16,21 @@ function build(done) {
     var env = AppProgram.validateAndGetEnvironment(appConfig.environment);
     const webPkEnv = appConfig.environment.prod === env ? 'prod' : 'dev';
     var config = require('../config/webpack.' + webPkEnv + '.config').config;
-    LogUtil.info('build', 'Building Application for environment: ' + env);
+    LogUtil.info('build', `Building Application for environment: ${env}`);
 
     if (appConfig.server.hmr) {
         Object.keys(config.entry).forEach(e => {
             if (Util.isArray(config.entry[e]) &&
                 (e === 'main' || e === 'app')) {
                 let noHmr = [];
-                LogUtil.info('Removing HMR entry for entry point: ' + e);
+                LogUtil.info('build', `Removing HMR entry for entry point: ${e}`);
                 config.entry[e].forEach(item => {
                     if (item !== 'webpack-hot-middleware/client?reload=true') {
                         noHmr.push(item);
                     }
                 });
-                LogUtil.info('Removed HMR entry for entry point successfully');
+                LogUtil.info('build',
+                    'Removed HMR entry for entry point successfully');
                 config.entry[e] = noHmr;
             }
         });

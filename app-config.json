@@ -42,7 +42,8 @@
     },
     "bundle": {
         "jsPattern": "js/[name].[hash:8].js",
-        "cssPattern": "css/[name].[contenthash:8].css"
+        "cssPattern": "css/[name].[hash:8].css",
+        "extractCss": true
     },
     "lint": {
         "report": {

@@ -14,7 +14,7 @@ function gulpCompileEs6(files, dist) {
 
 let gulpCompileEs6Task = gulpCompileEs6;
 gulpCompileEs6Task.displayName = 'compile:es6';
-gulpCompileEs6Task.description = 'compile:es6 description';
+gulpCompileEs6Task.description = 'Compile ES6+ Javascript modules for browsers';
 
 export {
     gulpCompileEs6Task,

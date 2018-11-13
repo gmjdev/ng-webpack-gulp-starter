@@ -64,7 +64,8 @@ function gulpCompileTs(tsConfig, files, done) {
 
 let gulpCompileTsTask = gulpCompileTs;
 gulpCompileTs.displayName = 'compile:ts';
-gulpCompileTs.description = 'compile:ts description';
+gulpCompileTs.description = 'compile typescript files to Javascript files ' +
+    'to be used in browsers';
 
 export {
     gulpCompileTsTask

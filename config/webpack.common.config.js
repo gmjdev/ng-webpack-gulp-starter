@@ -5,9 +5,6 @@ import {
 } from '../util/util';
 import webpack from 'webpack';
 import {
-    AngularCompilerPlugin
-} from '@ngtools/webpack';
-import {
     BundleAnalyzerPlugin
 } from 'webpack-bundle-analyzer';
 import {
@@ -16,10 +13,11 @@ import {
 import * as moment from 'moment';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
-import ProgressPlugin from 'webpack/lib/ProgressPlugin';
 import autoprefixer from 'autoprefixer';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
+// import ExtractTextPlugin from 'extract-text-webpack-plugin';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import rxPaths from 'rxjs/_esm5/path-mapping';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -53,6 +51,13 @@ const postCssLoader = {
         plugins: () => [
             autoprefixer()
         ]
+    }
+};
+const cssLoader = {
+    loader: 'css-loader',
+    options: {
+        sourceMap: true,
+        url: false
     }
 };
 
@@ -91,12 +96,10 @@ const webpackRules = [{
     },
     {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: [postCssLoader]
-        }),
+        use: [MiniCssExtractPlugin.loader, cssLoader, postCssLoader],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
+
     {
         test: /\.scss$|\.sass$/,
         use: [postCssLoader, sassLoader],
@@ -168,6 +171,10 @@ if (appConfig.assets.images && appConfig.assets.images.length > 0) {
 
 export const WebPackCommonConfig = {
     cache: false,
+    node: false,
+    performance: {
+        hints: false,
+    },
     entry: {
         polyfills: ['./src/polyfills.ts'],
         vendor: ['./src/vendor.ts'],
@@ -178,7 +185,8 @@ export const WebPackCommonConfig = {
             path.join(cwd, 'node_modules'),
             srcDirPath
         ],
-        extensions: appConfig.source.allowedExtension
+        extensions: appConfig.source.allowedExtension,
+        alias: rxPaths()
     },
     output: {
         path: path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev),
@@ -187,14 +195,17 @@ export const WebPackCommonConfig = {
         pathinfo: false
     },
     optimization: {
+        namedModules: true, // NamedModulesPlugin()
+        noEmitOnErrors: true, // NoEmitOnErrorsPlugin
+        concatenateModules: true, //ModuleConcatenationPlugin
         minimize: true,
-        splitChunks: {
+        splitChunks: { // CommonsChunkPlugin()
             name: true,
             cacheGroups: {
                 vendor: {
                     test: /[\\/]node_modules[\\/]/,
                     name: 'vendor',
-                    chunks: 'initial'
+                    chunks: 'all'
                 },
                 default: {
                     reuseExistingChunk: true
@@ -221,27 +232,15 @@ export const WebPackCommonConfig = {
                 files: ['package-lock.json'],
             },
         }),
-        new webpack.NamedModulesPlugin(),
         new webpack.AutomaticPrefetchPlugin(),
         new webpack.HashedModuleIdsPlugin(),
-        new AngularCompilerPlugin({
-            tsConfigPath: path.join(cwd, appConfig.source.srcDir,
-                appConfig.source.appTsConfig),
-            mainPath: path.join(cwd, appConfig.source.srcDir,
-                'main.ts'),
-            entryModule: path.join(cwd, appConfig.source.srcDir, appConfig.source.appDir,
-                'app.module#AppModule'),
-            sourceMap: true,
-            nameLazyFiles: true,
-            skipCodeGeneration: true
-        }),
-        new ProgressPlugin(),
         new CircularDependencyPlugin({
             exclude: /[\\/]node_modules[\\/]/
         }),
         new webpack.BannerPlugin({
             banner: processBanner(),
-            raw: false
+            raw: false,
+            entryOnly: true
         }),
         new BundleAnalyzerPlugin({
             openAnalyzer: false,
@@ -255,11 +254,6 @@ export const WebPackCommonConfig = {
             path.join(cwd, appConfig.source.tasksDir),
             path.join(cwd, appConfig.source.buildDir)
         ]),
-        // new LiveReloadPlugin({
-        //     appendScriptTag: true,
-        //     protocol: appConfig.server.https ? 'https' : 'http',
-        //     hostname: appConfig.server.host
-        // }),
         new webpack.ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)@angular/,
             /\/@angular(\\|\/)core(\\|\/)fesm5/,
@@ -271,7 +265,6 @@ export const WebPackCommonConfig = {
             title: appConfig.indexHtml.title,
             xhtml: true,
             data: appConfig.indexHtml
-        }),
-        new ExtractTextPlugin('[name].css'),
+        })
     ]
 };

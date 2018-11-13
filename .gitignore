@@ -5,5 +5,4 @@
 **/coverage/**
 **/reports/**
 **/tmp/**
-package-lock.json
 .awcache/**

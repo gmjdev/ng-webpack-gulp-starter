@@ -10,33 +10,27 @@ import {
     Util,
     LogUtil
 } from '../util/util';
+import MiniCssExtractPlugin from 'mini-css-extract-plugin';
+import {
+    AngularCompilerPlugin
+} from '@ngtools/webpack';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
-const destinationPath = path.join(cwd, appConfig.source.buildDir, appConfig.environment.dev);
-
-let pathsToClean = [appConfig.environment.dev];
-
-let cleanOptions = {
+const destinationPath = path.join(cwd, appConfig.source.buildDir,
+    appConfig.environment.dev);
+const pathsToClean = [appConfig.environment.dev];
+const cleanOptions = {
     root: path.resolve(cwd, appConfig.source.buildDir),
     verbose: true,
     dry: false
 };
-
 
 let devConfiguration = {
     mode: 'development',
     devtool: 'cheap-module-eval-source-map',
     output: {
         path: destinationPath
-    },
-    watchOptions: {
-        ignored: [
-            'node_modules',
-            appConfig.source.tasksDir,
-            appConfig.source.e2eDir,
-            appConfig.source.buildDir
-        ]
     },
     devServer: {
         contentBase: [
@@ -50,13 +44,27 @@ let devConfiguration = {
         compress: true,
     },
     plugins: [
+        new AngularCompilerPlugin({
+            tsConfigPath: path.join(cwd, appConfig.source.srcDir,
+                appConfig.source.appTsConfig),
+            mainPath: path.join(cwd, appConfig.source.srcDir,
+                'main.ts'),
+            entryModule: path.join(cwd, appConfig.source.srcDir, appConfig.source.appDir,
+                'app.module#AppModule'),
+            sourceMap: true,
+            nameLazyFiles: true,
+            skipCodeGeneration: true
+        }),
         new webpack.DefinePlugin({
             'process.env': JSON.stringify({
                 'NODE_ENV': appConfig.environment.dev
             })
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
-        new webpack.NoEmitOnErrorsPlugin()
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[id].css'
+        })
     ],
 };
 

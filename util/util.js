@@ -198,6 +198,18 @@ class IoUtil {
     static globSync(pattern, options) {
         return glob.sync(pattern, options);
     }
+
+    static isDirectoryEmpty(directory) {
+        fs.readdir(directory, function (err, files) {
+            if (err) {
+                throw new Error(`Unable to validate directory, ${err}`);
+            }
+            if (!err && files && files.length > 0) {
+                return true;
+            }
+        });
+        return false;
+    }
 }
 
 class Util {
