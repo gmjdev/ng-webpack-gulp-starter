@@ -96,7 +96,15 @@ const webpackRules = [{
     },
     {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, cssLoader, postCssLoader],
+        use: [{
+            loader: 'style-loader/url'
+        }, {
+            loader: 'file-loader',
+            options: {
+                name: '[path][name].[ext]',
+                publicPath: 'css/'
+            }
+        }],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
 
@@ -107,7 +115,17 @@ const webpackRules = [{
     },
     {
         test: /\.scss$|\.sass$/,
-        use: ['style-loader', postCssLoader, sassLoader],
+        // use: ['style-loader', postCssLoader, sassLoader],
+        // exclude: [path.join(srcDirPath, appConfig.source.appDir)]
+        use: [{
+            loader: 'style-loader/url'
+        }, {
+            loader: 'file-loader',
+            options: {
+                name: '[path][name].[ext]',
+                publicPath: 'css/'
+            }
+        }, postCssLoader, sassLoader],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
