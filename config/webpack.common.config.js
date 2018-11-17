@@ -3,7 +3,14 @@ import HtmlWebpackPlugin from 'html-webpack-plugin';
 import {
     IoUtil
 } from '../util/util';
-import webpack from 'webpack';
+import {
+    ProvidePlugin,
+    AutomaticPrefetchPlugin,
+    HashedModuleIdsPlugin,
+    BannerPlugin,
+    WatchIgnorePlugin,
+    ContextReplacementPlugin
+} from 'webpack';
 import {
     BundleAnalyzerPlugin
 } from 'webpack-bundle-analyzer';
@@ -11,13 +18,14 @@ import {
     _
 } from 'lodash';
 import * as moment from 'moment';
-import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 import autoprefixer from 'autoprefixer';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-// import ExtractTextPlugin from 'extract-text-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import rxPaths from 'rxjs/_esm5/path-mapping';
+import {
+    SuppressExtractedTextChunksWebpackPlugin
+} from '@angular-devkit/build-angular/src/angular-cli-files/plugins/suppress-entry-chunks-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -25,6 +33,8 @@ const srcDirPath = path.join(cwd, appConfig.source.srcDir);
 const includePaths = [
     path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
 ];
+const vendorEntries = ['./src/vendor.ts'];
+const appEntries = ['./src/main.ts'];
 
 function processBanner() {
     const data = {
@@ -57,7 +67,8 @@ const cssLoader = {
     loader: 'css-loader',
     options: {
         sourceMap: true,
-        url: false
+        url: false,
+        module: true
     }
 };
 
@@ -96,10 +107,9 @@ const webpackRules = [{
     },
     {
         test: /\.css$/,
-        use: [MiniCssExtractPlugin.loader, cssLoader, postCssLoader],
+        use: ['css-hot-loader', MiniCssExtractPlugin.loader, cssLoader, postCssLoader],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
-
     {
         test: /\.scss$|\.sass$/,
         use: [postCssLoader, sassLoader],
@@ -107,7 +117,7 @@ const webpackRules = [{
     },
     {
         test: /\.scss$|\.sass$/,
-        use: ['style-loader', postCssLoader, sassLoader],
+        use: ['css-hot-loader', MiniCssExtractPlugin.loader, cssLoader, postCssLoader, sassLoader],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
@@ -169,6 +179,13 @@ if (appConfig.assets.images && appConfig.assets.images.length > 0) {
     });
 }
 
+//copy global styles sheets and scripts
+if (appConfig.global.scripts && appConfig.global.scripts.length > 0) {
+    appConfig.global.scripts.forEach((item) => vendorEntries.push(item));
+}
+
+if (appConfig.global.styles && appConfig.global.styles.length > 0) {}
+
 export const WebPackCommonConfig = {
     cache: false,
     node: false,
@@ -177,8 +194,8 @@ export const WebPackCommonConfig = {
     },
     entry: {
         polyfills: ['./src/polyfills.ts'],
-        vendor: ['./src/vendor.ts'],
-        app: ['./src/main.ts']
+        vendor: vendorEntries,
+        app: appEntries
     },
     resolve: {
         modules: [
@@ -207,61 +224,53 @@ export const WebPackCommonConfig = {
                     name: 'vendor',
                     chunks: 'all'
                 },
+                styles: {
+                    test: /([\\|/]node_modules[\\|/]?)([\\|/](\w[\w ]*.*))+[\\|/]?(.css)/,
+                    chunks: 'all',
+                    enforce: true
+                },
                 default: {
                     reuseExistingChunk: true
                 }
             }
         }
     },
-    devServer: {
-        clientLogLevel: 'none',
-        port: appConfig.server.port || 9000,
-        https: appConfig.server.https || false,
-        proxy: appConfig.server.proxy || {}
-    },
     module: {
         rules: webpackRules
     },
     plugins: [
         new CopyWebpackPlugin(assets),
-        new HardSourceWebpackPlugin({
-            cacheDirectory: path.join(cwd, 'cache'),
-            environmentHash: {
-                root: process.cwd(),
-                directories: [],
-                files: ['package-lock.json'],
-            },
-        }),
-        new webpack.AutomaticPrefetchPlugin(),
-        new webpack.HashedModuleIdsPlugin(),
+        new AutomaticPrefetchPlugin(),
+        new HashedModuleIdsPlugin(),
+        new SuppressExtractedTextChunksWebpackPlugin(),
         new CircularDependencyPlugin({
             exclude: /[\\/]node_modules[\\/]/
         }),
-        new webpack.BannerPlugin({
+        new BannerPlugin({
             banner: processBanner(),
-            raw: false,
-            entryOnly: true
+            raw: false
         }),
         new BundleAnalyzerPlugin({
             openAnalyzer: false,
             logLevel: 'warn'
         }),
-        new webpack.ProvidePlugin({
+        new ProvidePlugin({
             _: 'lodash'
         }),
-        new webpack.WatchIgnorePlugin([
+        new WatchIgnorePlugin([
             path.join(cwd, 'node_modules'),
             path.join(cwd, appConfig.source.tasksDir),
             path.join(cwd, appConfig.source.buildDir)
         ]),
-        new webpack.ContextReplacementPlugin(
+        new ContextReplacementPlugin(
             /angular(\\|\/)core(\\|\/)@angular/,
             /\/@angular(\\|\/)core(\\|\/)fesm5/,
             srcDirPath, // location of your src
             {} // a map of your routes
         ),
         new HtmlWebpackPlugin({
-            template: path.join(cwd, appConfig.source.srcDir, appConfig.indexHtml.templateFile),
+            template: path.join(cwd, appConfig.source.srcDir,
+                appConfig.indexHtml.templateFile),
             title: appConfig.indexHtml.title,
             xhtml: true,
             data: appConfig.indexHtml

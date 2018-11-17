@@ -14,6 +14,7 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -39,11 +40,23 @@ let devConfiguration = {
         publicPath: appConfig.server.path,
         open: true,
         openPage: '/',
-        historyApiFallback: true,
+        historyApiFallback: appConfig.server.historyApiFallback,
         hot: appConfig.server.hmr,
         compress: true,
+        clientLogLevel: 'none',
+        port: appConfig.server.port || 9000,
+        https: appConfig.server.https || false,
+        proxy: appConfig.server.proxy || {}
     },
     plugins: [
+        new HardSourceWebpackPlugin({
+            cacheDirectory: path.join(cwd, 'cache'),
+            environmentHash: {
+                root: process.cwd(),
+                directories: [],
+                files: ['package-lock.json'],
+            },
+        }),
         new AngularCompilerPlugin({
             tsConfigPath: path.join(cwd, appConfig.source.srcDir,
                 appConfig.source.appTsConfig),

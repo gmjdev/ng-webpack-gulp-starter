@@ -1,4 +1,8 @@
 {
+    "global": {
+        "scripts": [],
+        "styles": []
+    },
     "source": {
         "srcDir": "src",
         "appDir": "app",
@@ -108,7 +112,8 @@
             "/api": "http://localhost:3000"
         },
         "path": "/",
-        "hmr": true
+        "hmr": true,
+        "historyApiFallback": true
     },
     "environments": {
         "dev": "development",
