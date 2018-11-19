@@ -6,17 +6,17 @@ import { environment } from '../environments/environment';
 import './main.scss';
 
 if (environment.production) {
-  enableProdMode();
+    enableProdMode();
 }
 
 const bootstrap = () => platformBrowserDynamic().bootstrapModule(AppModule);
 
 if (environment.hmr) {
-  if (module['hot']) {
-    hmrBootstrap(module, bootstrap);
-  } else {
-    console.error('HMR is not enabled for webpack-dev-server!');
-  }
+    if (module['hot']) {
+        hmrBootstrap(module, bootstrap);
+    } else {
+        console.error('HMR is not enabled for webpack-dev-server!');
+    }
 } else {
-  bootstrap().catch(err => console.error(err));
+    bootstrap().catch(err => console.error(err));
 }

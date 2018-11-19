@@ -1,4 +1,8 @@
 {
+    "global": {
+        "scripts": [],
+        "styles": []
+    },
     "source": {
         "srcDir": "src",
         "appDir": "app",
@@ -30,15 +34,13 @@
     "assets": {
         "fonts": [
             "node_modules\\angular-bootstrap-md\\font",
-            "node_modules\\@fortawesome\\fontawesome-free\\webfonts"
+            "node_modules\\@fortawesome\\fontawesome-free\\webfonts",
+            "src\\assets\\font"
         ],
         "images": [
-            "node_modules\\angular-bootstrap-md\\img"
+            "node_modules\\angular-bootstrap-md\\img",
+            "src\\assets\\images"
         ]
-    },
-    "environment": {
-        "dev": "development",
-        "prod": "production"
     },
     "bundle": {
         "jsPattern": "js/[name].[hash:8].js",
@@ -108,7 +110,8 @@
             "/api": "http://localhost:3000"
         },
         "path": "/",
-        "hmr": true
+        "hmr": true,
+        "historyApiFallback": true
     },
     "environments": {
         "dev": "development",

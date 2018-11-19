@@ -19,9 +19,9 @@ function cleanTmp() {
 }
 
 function cleanDist() {
-    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
-    const buildDir = appConfig.environment.prod === env ? appConfig.environment.prod :
-        appConfig.environment.dev;
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environments);
+    const buildDir = appConfig.environments.prod === env ? appConfig.environments.prod :
+        appConfig.environments.dev;
     LogUtil.info('clean', 'Performing clean up task for build directory for environment: ' + buildDir);
     const dir = path.join(cwd, appConfig.source.buildDir, buildDir) + '/**';
     const exclude = '!' + dir.replace('/**', '');

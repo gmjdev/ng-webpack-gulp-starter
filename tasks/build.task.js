@@ -13,12 +13,13 @@ const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 
 function build(done) {
-    var env = AppProgram.validateAndGetEnvironment(appConfig.environment);
-    const webPkEnv = appConfig.environment.prod === env ? 'prod' : 'dev';
-    var config = require('../config/webpack.' + webPkEnv + '.config').config;
+    var env = AppProgram.validateAndGetEnvironment(appConfig.environments);
+    const isProdEnv = appConfig.environments.prod === env;
+    const webPkEnv = isProdEnv ? 'prod' : 'dev';
+    var config = require(`../config/webpack.${webPkEnv}.config`).config;
     LogUtil.info('build', `Building Application for environment: ${env}`);
 
-    if (appConfig.server.hmr) {
+    if (appConfig.server.hmr && !isProdEnv) {
         Object.keys(config.entry).forEach(e => {
             if (Util.isArray(config.entry[e]) &&
                 (e === 'main' || e === 'app')) {
@@ -55,7 +56,7 @@ function build(done) {
                 LogUtil.error('build', 'Error: ' + JSON.stringify(stats));
             } else {
                 LogUtil.success('build', 'Building Application completed successfully :)');
-                LogUtil.info(stats.toString("errors-only"));
+                LogUtil.info(stats.toString('errors-only'));
             }
             done();
             resolve();

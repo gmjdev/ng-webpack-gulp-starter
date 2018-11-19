@@ -4,7 +4,10 @@ import merge from 'webpack-merge';
 import {
     WebPackCommonConfig
 } from './webpack.common.config';
-import webpack from 'webpack';
+import {
+    DefinePlugin,
+    HotModuleReplacementPlugin
+} from 'webpack';
 import {
     IoUtil,
     Util,
@@ -14,12 +17,13 @@ import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
+import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const destinationPath = path.join(cwd, appConfig.source.buildDir,
-    appConfig.environment.dev);
-const pathsToClean = [appConfig.environment.dev];
+    appConfig.environments.dev);
+const pathsToClean = [appConfig.environments.dev];
 const cleanOptions = {
     root: path.resolve(cwd, appConfig.source.buildDir),
     verbose: true,
@@ -39,11 +43,23 @@ let devConfiguration = {
         publicPath: appConfig.server.path,
         open: true,
         openPage: '/',
-        historyApiFallback: true,
+        historyApiFallback: appConfig.server.historyApiFallback,
         hot: appConfig.server.hmr,
         compress: true,
+        clientLogLevel: 'none',
+        port: appConfig.server.port || 9000,
+        https: appConfig.server.https || false,
+        proxy: appConfig.server.proxy || {}
     },
     plugins: [
+        new HardSourceWebpackPlugin({
+            cacheDirectory: path.join(cwd, 'cache'),
+            environmentHash: {
+                root: process.cwd(),
+                directories: [],
+                files: ['package-lock.json'],
+            },
+        }),
         new AngularCompilerPlugin({
             tsConfigPath: path.join(cwd, appConfig.source.srcDir,
                 appConfig.source.appTsConfig),
@@ -55,14 +71,14 @@ let devConfiguration = {
             nameLazyFiles: true,
             skipCodeGeneration: true
         }),
-        new webpack.DefinePlugin({
+        new DefinePlugin({
             'process.env': JSON.stringify({
-                'NODE_ENV': appConfig.environment.dev
+                'NODE_ENV': appConfig.environments.dev
             })
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new MiniCssExtractPlugin({
-            filename: '[name].css',
+            filename: 'css/[name].css',
             chunkFilename: '[id].css'
         })
     ],
@@ -77,7 +93,9 @@ if (appConfig.server.hmr) {
                 'webpack-hot-middleware/client?reload=true');
         }
     });
-    devConfiguration.plugins.push(new webpack.HotModuleReplacementPlugin());
+    devConfiguration.plugins.push(new HotModuleReplacementPlugin({
+        multiStep: true
+    }));
 }
 
 export const config = merge(WebPackCommonConfig, devConfiguration);

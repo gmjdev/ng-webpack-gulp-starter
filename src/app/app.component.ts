@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import '../global.css';
-import '../global.scss';
+// import '../global.scss';
+// import '../global.css';
 
 @Component({
     selector: 'app-root',

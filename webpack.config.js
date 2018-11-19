@@ -13,8 +13,8 @@ import {
 } from './config/app.config.options';
 
 export function isProdEnvironment() {
-    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
-    return appConfig.environment.prod === env;
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environments);
+    return appConfig.environments.prod === env;
 }
 
 const cwd = process.cwd();

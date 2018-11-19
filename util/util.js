@@ -103,7 +103,7 @@ class IoUtil {
                     'please specify valid environments from: ') +
                 chalk.green(JSON.stringify(validEnv)));
         }
-        return exists;
+        return availableEnvironment[exists].toLowerCase();
     }
 
     static fileExists(filePath) {

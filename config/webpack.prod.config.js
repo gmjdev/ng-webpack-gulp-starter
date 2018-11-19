@@ -9,25 +9,41 @@ import {
 } from '../util/util';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
-    webpack,
+    DefinePlugin,
+    SourceMapDevToolPlugin,
     HashedModuleIdsPlugin
 } from 'webpack';
 import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
-import UglifyJSPlugin from 'uglifyjs-webpack-plugin';
 import {
     CleanCssWebpackPlugin
 } from '@angular-devkit/build-angular/src/angular-cli-files/plugins/cleancss-webpack-plugin';
-import {
-    SuppressExtractedTextChunksWebpackPlugin
-} from '@angular-devkit/build-angular/src/angular-cli-files/plugins/suppress-entry-chunks-webpack-plugin';
-
+import TerserPlugin from 'terser-webpack-plugin';
+import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
+const uglifyJsOptions = {
+    parallel: true,
+    sourceMap: true,
+    cache: true,
+    extractComments: true,
+    terserOptions: {
+        warnings: false,
+        compress: {
+            inline: 1
+        },
+        mangle: true,
+        output: null,
+        toplevel: false,
+        nameCache: null,
+        ie8: false,
+        'keep_fnames': false
+    }
+};
 
-let pathsToClean = [appConfig.environment.prod];
+let pathsToClean = [appConfig.environments.prod];
 
 let cleanOptions = {
     root: path.resolve(cwd, appConfig.source.buildDir),
@@ -39,53 +55,43 @@ export const config = merge(WebPackCommonConfig, {
     mode: 'production',
     output: {
         path: path.resolve(cwd, appConfig.source.buildDir,
-            appConfig.environment.prod)
+            appConfig.environments.prod)
     },
     optimization: {
         noEmitOnErrors: true,
         runtimeChunk: 'single',
-        splitChunks: {
+        namedModules: true, // NamedModulesPlugin()
+        concatenateModules: true, //ModuleConcatenationPlugin
+        minimize: true,
+        splitChunks: { // CommonsChunkPlugin()
+            name: true,
+            chunks: 'all',
+            automaticNameDelimiter: '-',
             cacheGroups: {
                 default: {
-                    chunks: 'async',
                     minChunks: 2,
-                    priority: 10
+                    priority: 10,
+                    reuseExistingChunk: true
                 },
-                common: {
-                    name: 'common',
-                    chunks: 'async',
-                    minChunks: 2,
+                styles: {
+                    name: 'styles',
+                    chunks: 'all',
                     enforce: true,
-                    priority: 5
+                    test: /([\\|/]node_modules[\\|/]?)([\\|/](\w[\w ]*.*))+[\\|/]?(.css)/
                 },
-                vendors: false,
-                vendor: false
+                vendor: {
+                    test: /[\\/]node_modules[\\/]/,
+                },
             }
         },
         minimizer: [
             new HashedModuleIdsPlugin(),
-            new UglifyJSPlugin({
-                sourceMap: true,
-                cache: true,
-                parallel: true,
-                uglifyOptions: {
-                    safari10: true,
-                    output: {
-                        'ascii_only': true,
-                        comments: false,
-                        webkit: true,
-                    },
-                    compress: {
-                        'pure_getters': true,
-                        passes: 3,
-                        inline: 3,
-                    }
-                }
-            }),
+            new TerserPlugin(uglifyJsOptions),
             new CleanCssWebpackPlugin({
                 sourceMap: true,
                 test: (file) => /\.(?:css)$/.test(file),
-            })
+            }),
+            new OptimizeCSSAssetsPlugin({})
         ]
     },
     plugins: [
@@ -104,16 +110,19 @@ export const config = merge(WebPackCommonConfig, {
                     'environment.prod.ts')
             }
         }),
-        new SuppressExtractedTextChunksWebpackPlugin(),
-        new webpack.DefinePlugin({
+        new DefinePlugin({
             'process.env': JSON.stringify({
-                'NODE_ENV': appConfig.environment.prod
+                'NODE_ENV': appConfig.environments.prod
             })
+        }),
+        new SourceMapDevToolPlugin({
+            filename: 'sourcemaps/[file].map',
+            exclude: ['vendor.js']
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new MiniCssExtractPlugin({
-            cache: false,
-            filename: appConfig.bundle.cssPattern || '[name].[contenthash:8].css',
+            cache: true,
+            filename: appConfig.bundle.cssPattern || 'css/[name].[contenthash:8].css',
             chunkFilename: '[id].css'
         })
     ],

@@ -25,15 +25,16 @@ function buildUrl() {
 
 function serveBuild() {
     const app = express();
-    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environments);
+    const webPkEnv = appConfig.environments.prod === env ? 'prod' : 'dev';
     LogUtil.info('serve', `Serving Application for environment: ${env}`);
-    const webPackConfig = require('../config/webpack.' + env + '.config').config;
+    const webPackConfig = require(`../config/webpack.${webPkEnv}.config`).config;
     const directory = appConfig.source.buildDir;
-    const servePath = path.join(cwd, directory, appConfig.environment[env]);
+    const servePath = path.join(cwd, directory, env);
     LogUtil.info('serve', `Serving build from: ${servePath}`);
     if (!IoUtil.isDirectoryEmpty(servePath)) {
         app.use(express.static(servePath));
-        app.listen(webPackConfig.devServer.port, () => {
+        app.listen(appConfig.server.port || 9000, () => {
             const url = buildUrl();
             LogUtil.info('serve', `Open your browser if it is not already opened @ ${url}`);
             opn(url);
@@ -45,30 +46,30 @@ function serveBuild() {
 
 function serve() {
     LogUtil.info('serve', 'Running Webpack build Server...');
-    const env = AppProgram.validateAndGetEnvironment(appConfig.environment);
-    const webPackConfig = require('../config/webpack.' + env + '.config').config;
+    const env = AppProgram.validateAndGetEnvironment(appConfig.environments);
+    const webPkEnv = appConfig.environments.prod === env ? 'prod' : 'dev';
+    const webPackConfig = require(`../config/webpack.${webPkEnv}.config`).config;
     const compiler = webpack(webPackConfig);
     const app = express();
+    const enableHot = webPackConfig.devServer && webPackConfig.devServer.hot;
     app.use(middleware(compiler, {
         noInfo: false,
-        hot: webPackConfig.devServer.hot,
+        hot: enableHot,
         publicPath: webPackConfig.output.publicPath,
-        stats: {
-            colors: true
-        },
-        logLevel: 'error',
+        stats: 'minimal',
+        logLevel: 'debug',
         overlay: {
             warnings: false,
             errors: true
         },
     }));
 
-    if (appConfig.server.hmr) {
+    if (appConfig.server.hmr && enableHot) {
         LogUtil.info('serve', 'Using HMR with webpack');
         app.use(hotMiddleware(compiler));
     }
 
-    app.listen(webPackConfig.devServer.port, () => {
+    app.listen(appConfig.server.port || 9000, () => {
         const url = buildUrl();
         LogUtil.info('serve', `Open your browser if it is not already opened @ ${url}`);
         opn(url);
