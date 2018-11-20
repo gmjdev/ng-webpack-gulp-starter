@@ -13,5 +13,8 @@
                 "forceAllTransforms": true
             }
         ]
+    ],
+    "plugins": [
+        "@babel/plugin-proposal-object-rest-spread"
     ]
 }

@@ -18,6 +18,7 @@ import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -77,9 +78,12 @@ let devConfiguration = {
             })
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
-        new MiniCssExtractPlugin({
+        // new MiniCssExtractPlugin({
+        //     filename: 'css/[name].css',
+        //     chunkFilename: '[id].css'
+        // })
+        new ExtractTextPlugin({
             filename: 'css/[name].css',
-            chunkFilename: '[id].css'
         })
     ],
 };

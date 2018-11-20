@@ -24,6 +24,8 @@ import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
+const destinationPath = path.resolve(cwd, appConfig.source.buildDir,
+    appConfig.environments.prod);
 const uglifyJsOptions = {
     parallel: true,
     sourceMap: true,
@@ -54,8 +56,7 @@ let cleanOptions = {
 export const config = merge(WebPackCommonConfig, {
     mode: 'production',
     output: {
-        path: path.resolve(cwd, appConfig.source.buildDir,
-            appConfig.environments.prod)
+        path: destinationPath
     },
     optimization: {
         noEmitOnErrors: true,

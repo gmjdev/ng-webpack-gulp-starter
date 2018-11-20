@@ -26,7 +26,7 @@ import rxPaths from 'rxjs/_esm5/path-mapping';
 import {
     SuppressExtractedTextChunksWebpackPlugin
 } from '@angular-devkit/build-angular/src/angular-cli-files/plugins/suppress-entry-chunks-webpack-plugin';
-import ExtractCssChunks from 'extract-css-chunks-webpack-plugin';
+import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -49,7 +49,7 @@ function processBanner() {
 }
 
 const sassLoader = {
-    loader: 'fast-sass-loader',
+    loader: 'sass-loader',
     options: {
         sourceMap: true,
         'includePaths': includePaths
@@ -60,7 +60,15 @@ const postCssLoader = {
     options: {
         sourceMap: true,
         plugins: () => [
-            autoprefixer()
+            require('postcss-import'),
+            require('postcss-cssnext')({
+                features: {
+                    customProperties: {
+                        warnings: false
+                    }
+                }
+            }),
+            require('cssnano')()
         ]
     }
 };
@@ -69,9 +77,9 @@ const cssLoader = {
     options: {
         sourceMap: true,
         url: false,
-        module: false,
+        module: true,
         localIdentName: '[name]__[local].[hash:base64:5]',
-        importLoaders: 1
+        importLoaders: 2
     }
 };
 
@@ -83,23 +91,20 @@ const webpackRules = [{
     },
     {
         test: /\.(sc|sa|c)ss$/,
-        use: ['style-loader', {
-            loader: 'css-loader',
-            options: {
-                sourceMap: true,
-                url: false,
-                module: false,
-                localIdentName: '[name]__[local].[hash:base64:5]',
-                importLoaders: 2
+        use: ExtractTextPlugin.extract([
+            // 'css-hot-loader',
+            // MiniCssExtractPlugin.loader,
+            cssLoader,
+            postCssLoader,
+            {
+                loader: 'sass-loader',
+                options: {
+                    sourceMap: true,
+                    'includePaths': includePaths,
+                    indentedSyntax: false
+                }
             }
-        }, postCssLoader, {
-            loader: 'sass-loader',
-            options: {
-                sourceMap: true,
-                'includePaths': includePaths,
-                indentedSyntax: false
-            }
-        }],
+        ]),
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
@@ -227,16 +232,6 @@ export const WebPackCommonConfig = {
         minimize: true,
         splitChunks: { // CommonsChunkPlugin()
             cacheGroups: {
-                // vendor: {
-                //     test: /[\\/]node_modules[\\/]/,
-                //     name: 'vendor',
-                //     chunks: 'all'
-                // },
-                styles: {
-                    test: /([\\|/]node_modules[\\|/]?)([\\|/](\w[\w ]*.*))+[\\|/]?(.s?[ac]ss)/,
-                    chunks: 'all',
-                    name: 'vendor-styles'
-                },
                 default: {
                     reuseExistingChunk: true
                 }
@@ -283,16 +278,6 @@ export const WebPackCommonConfig = {
             title: appConfig.indexHtml.title,
             xhtml: true,
             data: appConfig.indexHtml
-        }),
-        new ExtractCssChunks({
-            // Options similar to the same options in webpackOptions.output
-            // both options are optional
-            filename: 'css/[name].css',
-            chunkFilename: 'css/[id].css',
-            hot: true, // if you want HMR - we try to automatically inject hot reloading but if it's not working, add it to the config
-            orderWarning: true, // Disable to remove warnings about conflicting order between imports
-            reloadAll: true, // when desperation kicks in - this is a brute force HMR flag
-            cssModules: false // if you use cssModules, this can help.
-        }),
+        })
     ]
 };
