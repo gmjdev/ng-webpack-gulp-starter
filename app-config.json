@@ -120,7 +120,7 @@
     "indexHtml": {
         "templateFile": "index.tpl.ejs",
         "title": "Angular Webpack Demo",
-        "baseHref": "/",
+        "baseHref": "./images/",
         "metas": [{
                 "name": "Keywords",
                 "content": ["angular", "webpack", "css"]

@@ -53,20 +53,22 @@ function serve() {
     const app = express();
     const enableHot = webPackConfig.devServer && webPackConfig.devServer.hot;
     app.use(middleware(compiler, {
-        noInfo: false,
-        hot: enableHot,
+        noInfo: true,
         publicPath: webPackConfig.output.publicPath,
-        stats: 'minimal',
         logLevel: 'debug',
         overlay: {
             warnings: false,
             errors: true
-        },
+        }
     }));
 
     if (appConfig.server.hmr && enableHot) {
         LogUtil.info('serve', 'Using HMR with webpack');
-        app.use(hotMiddleware(compiler));
+        app.use(hotMiddleware(compiler, {
+            log: console.log,
+            path: '/__webpack_hmr',
+            heartbeat: 10 * 1000
+        }));
     }
 
     app.listen(appConfig.server.port || 9000, () => {

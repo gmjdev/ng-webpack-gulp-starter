@@ -19,23 +19,21 @@ import {
 } from 'lodash';
 import * as moment from 'moment';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
-import autoprefixer from 'autoprefixer';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import rxPaths from 'rxjs/_esm5/path-mapping';
 import {
     SuppressExtractedTextChunksWebpackPlugin
 } from '@angular-devkit/build-angular/src/angular-cli-files/plugins/suppress-entry-chunks-webpack-plugin';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
-
+import LiveReloadPlugin from 'webpack-livereload-plugin';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const srcDirPath = path.join(cwd, appConfig.source.srcDir);
 const includePaths = [
     path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
 ];
-const vendorEntries = ['./src/vendor.ts'];
-const appEntries = ['./src/main.ts'];
+const vendorEntries = ['./src/vendor.ts', './src/vendor.scss'];
+const appEntries = ['./src/main.ts', './src/main.scss'];
 
 function processBanner() {
     const data = {
@@ -52,7 +50,8 @@ const sassLoader = {
     loader: 'sass-loader',
     options: {
         sourceMap: true,
-        'includePaths': includePaths
+        'includePaths': includePaths,
+        indentedSyntax: false
     }
 };
 const postCssLoader = {
@@ -67,8 +66,7 @@ const postCssLoader = {
                         warnings: false
                     }
                 }
-            }),
-            require('cssnano')()
+            })
         ]
     }
 };
@@ -77,7 +75,7 @@ const cssLoader = {
     options: {
         sourceMap: true,
         url: false,
-        module: true,
+        modules: false,
         localIdentName: '[name]__[local].[hash:base64:5]',
         importLoaders: 2
     }
@@ -86,25 +84,17 @@ const cssLoader = {
 /* eslint-disable indent */
 const webpackRules = [{
         test: /\.(sc|sa|c)ss$/,
-        use: [postCssLoader, sassLoader],
+        use: ['to-string-loader', cssLoader, postCssLoader, sassLoader],
         include: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
         test: /\.(sc|sa|c)ss$/,
-        use: ExtractTextPlugin.extract([
-            // 'css-hot-loader',
-            // MiniCssExtractPlugin.loader,
+        use: [
+            'style-loader',
             cssLoader,
             postCssLoader,
-            {
-                loader: 'sass-loader',
-                options: {
-                    sourceMap: true,
-                    'includePaths': includePaths,
-                    indentedSyntax: false
-                }
-            }
-        ]),
+            sassLoader
+        ],
         exclude: [path.join(srcDirPath, appConfig.source.appDir)]
     },
     {
@@ -124,36 +114,26 @@ const webpackRules = [{
         }
     },
     {
-        test: /\.ts$/,
-        use: ['@ngtools/webpack'],
+        test: /(?:\.ngfactory\.js|\.ngstyle\.js|\.ts)$/,
+        use: ['@ngtools/webpack', 'angular-router-loader?genDir=compiled&aot=false'],
         exclude: [/\.(spec|e2e)\.ts$/]
-    },
-    {
-        test: /\.js$/,
-        exclude: /(ngfactory|ngstyle).js$/,
-        enforce: 'pre',
-        use: 'source-map-loader'
     },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
         use: ['file-loader?name=assets/[name].[hash].[ext]']
-    },
-    {
+    }, {
         test: /\.ejs$/,
         loader: 'ejs-loader'
-    },
-    {
+    }, {
         test: /\.js$/,
         exclude: /node_modules/,
         loader: 'babel-loader'
-    },
-    {
+    }, {
         test: /[/\\]@angular[/\\]core[/\\].+\.js$/,
         parser: {
             system: true
         },
-    },
-    {
+    }, {
         test: /\.(woff(2)?|ttf|eot|svg)(\?v=\d+\.\d+\.\d+)?$/,
         use: [{
             loader: 'file-loader',
@@ -220,40 +200,69 @@ export const WebPackCommonConfig = {
         alias: rxPaths()
     },
     output: {
-        path: path.join(cwd, appConfig.source.buildDir, appConfig.environments.dev),
         filename: appConfig.bundle.jsPattern || 'js/[name].[hash:8].js',
         publicPath: appConfig.server.path,
         pathinfo: false
     },
+    watch: true,
+    watchOptions: {
+        poll: 1000,
+        ignored: [
+            appConfig.source.tempDir,
+            appConfig.source.assetsDir,
+            appConfig.source.tasksDir,
+            'node_modules'
+        ]
+    },
+    stats: 'minimal',
     optimization: {
         namedModules: true, // NamedModulesPlugin()
         noEmitOnErrors: true, // NoEmitOnErrorsPlugin
         concatenateModules: true, //ModuleConcatenationPlugin
         minimize: true,
-        splitChunks: { // CommonsChunkPlugin()
+        splitChunks: {
             cacheGroups: {
-                default: {
-                    reuseExistingChunk: true
+                vendors: false,
+                default: false,
+                vendor: {
+                    chunks: 'all',
+                    test: /node_modules/,
+                    name: 'common',
+                    priority: 100
+                },
+                common: {
+                    name: 'common',
+                    minChunks: 2,
+                    chunks: 'async',
+                    priority: 10,
+                    reuseExistingChunk: true,
+                    enforce: true
                 }
             }
         }
     },
     module: {
-        rules: webpackRules
+        rules: webpackRules,
+        exprContextCritical: false
     },
     plugins: [
+        // new LiveReloadPlugin({
+        //     protocol: appConfig.server.https ? 'https' : 'http',
+        //     hostname: appConfig.server.host,
+        //     appendScriptTag: true,
+        // }),
         new CopyWebpackPlugin(assets),
-        new AutomaticPrefetchPlugin(),
-        new HashedModuleIdsPlugin(),
+        // new AutomaticPrefetchPlugin(),
+        // new HashedModuleIdsPlugin(),
         new SuppressExtractedTextChunksWebpackPlugin(),
         new CircularDependencyPlugin({
             exclude: /[\\/]node_modules[\\/]/
         }),
-        new BannerPlugin({
-            banner: processBanner(),
-            raw: false,
-            exclude: /vendor/
-        }),
+        // new BannerPlugin({
+        //     banner: processBanner(),
+        //     raw: false,
+        //     exclude: /vendor/
+        // }),
         new BundleAnalyzerPlugin({
             openAnalyzer: false,
             logLevel: 'warn'
@@ -277,7 +286,8 @@ export const WebPackCommonConfig = {
                 appConfig.indexHtml.templateFile),
             title: appConfig.indexHtml.title,
             xhtml: true,
-            data: appConfig.indexHtml
+            data: appConfig.indexHtml,
+            favicon: appConfig.indexHtml.favicon
         })
     ]
 };

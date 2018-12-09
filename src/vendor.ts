@@ -9,4 +9,3 @@ import '@angular/router';
 // RxJS
 /* tslint:disable:import-blacklist */
 import 'rxjs';
-import './vendor.scss';

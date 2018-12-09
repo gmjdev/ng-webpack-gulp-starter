@@ -18,7 +18,6 @@ import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
 import HardSourceWebpackPlugin from 'hard-source-webpack-plugin';
-import ExtractTextPlugin from 'extract-text-webpack-plugin';
 
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
@@ -35,17 +34,20 @@ let devConfiguration = {
     mode: 'development',
     devtool: 'cheap-module-eval-source-map',
     output: {
-        path: destinationPath
+        path: destinationPath,
+        publicPath: appConfig.server.path
     },
     devServer: {
-        contentBase: [
-            destinationPath
-        ],
         publicPath: appConfig.server.path,
-        open: true,
-        openPage: '/',
-        historyApiFallback: appConfig.server.historyApiFallback,
+        contentBase: destinationPath,
+        watchContentBase: true,
+        historyApiFallback: {
+            disableHostCheck: true,
+            disableDotRule: true,
+            htmlAcceptHeaders: ['text/html', 'application/xhtml+xml']
+        },
         hot: appConfig.server.hmr,
+        hotOnly: appConfig.server.hmr,
         compress: true,
         clientLogLevel: 'none',
         port: appConfig.server.port || 9000,
@@ -82,9 +84,6 @@ let devConfiguration = {
         //     filename: 'css/[name].css',
         //     chunkFilename: '[id].css'
         // })
-        new ExtractTextPlugin({
-            filename: 'css/[name].css',
-        })
     ],
 };
 
@@ -92,9 +91,13 @@ if (appConfig.server.hmr) {
     Object.keys(WebPackCommonConfig.entry).forEach(e => {
         if (Util.isArray(WebPackCommonConfig.entry[e]) &&
             (e === 'main' || e === 'app')) {
-            LogUtil.info('Adding HMR entry for entry point: ' + e);
+            const host = appConfig.server.host;
+            const port = appConfig.server.port || 9000;
+            const scheme = appConfig.server.https ? 'https' : 'http';
+            const urlPath = `${scheme}://${host}:${port}/__webpack_hmr`;
+            LogUtil.info(`Adding HMR entry for entry point: ${e} with path ${urlPath}`);
             WebPackCommonConfig.entry[e].push(
-                'webpack-hot-middleware/client?reload=true');
+                `webpack-hot-middleware/client?path=${urlPath}&reload=true`);
         }
     });
     devConfiguration.plugins.push(new HotModuleReplacementPlugin({

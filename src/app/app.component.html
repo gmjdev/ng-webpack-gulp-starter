@@ -2,18 +2,18 @@
     <mdb-navbar SideClass="navbar fixed-top navbar-expand-lg navbar-dark indigo scrolling-navbar intro-fixed-nav"
         [containerInside]="false">
         <mdb-navbar-brand>
-            <a class="logo navbar-brand" href="#"><strong>Navbarsss</strong></a>
+            <a class="logo navbar-brand" href="#"><strong>Navbar Run</strong></a>
         </mdb-navbar-brand>
         <links>
             <ul class="navbar-nav mr-auto">
-                <li class="nav-item active waves-light" mdbWavesEffect>
-                    <a class="nav-link">Home <span class="sr-only">(current)</span></a>
+                <li class="nav-item waves-light" routerLinkActive="active" mdbWavesEffect>
+                    <a class="nav-link" routerLink="/index">Home <span class="sr-only">(current)</span></a>
                 </li>
-                <li class="nav-item waves-light" mdbWavesEffect>
-                    <a class="nav-link">Link</a>
+                <li class="nav-item waves-light" routerLinkActive="active" mdbWavesEffect>
+                    <a class="nav-link" routerLink="/about">About</a>
                 </li>
-                <li class="nav-item waves-light" mdbWavesEffect>
-                    <a class="nav-link">Profile</a>
+                <li class="nav-item waves-light" routerLinkActive="active" mdbWavesEffect>
+                    <a class="nav-link" routerLink="/contact">Contact</a>
                 </li>
             </ul>
         </links>
@@ -39,60 +39,6 @@
 <!--Main Layout-->
 <main>
     <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <h1 class="scss">{{ title }}</h1>
-                <h2>Application Components HTML hello world well well one+T</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer a orci faucibus, venenatis arcu ut,
-                    ultrices tortor.
-                    Vestibulum faucibus ligula lectus, non malesuada nisl pulvinar non. Praesent maximus facilisis
-                    arcu, nec venenatis
-                    augue scelerisque ut. Aenean eget ultrices diam, sed sollicitudin enim. Duis ante massa, maximus ac
-                    mattis non, tempus
-                    eu ex. Integer sit amet nunc non lorem blandit ullamcorper. Nunc condimentum tellus eu ullamcorper
-                    fermentum. Donec
-                    metus nisi, luctus eget nulla a, egestas posuere risus. Vestibulum viverra sapien gravida mauris
-                    congue blandit.</p>
-
-                <p>In luctus ullamcorper lacus in condimentum. In tincidunt augue libero, in tempus mi convallis nec.
-                    Maecenas aliquet
-                    ipsum vel dolor euismod volutpat. Vivamus vitae tortor convallis, accumsan tortor eu, congue ipsum.
-                    Proin aliquam nisl
-                    mi, non finibus sapien porttitor ac. Cras bibendum sit amet enim sed mollis. Aliquam porttitor
-                    aliquam ex vitae
-                    faucibus. Vestibulum lacus sem, iaculis at lectus mollis, ullamcorper semper tellus. Phasellus id
-                    congue ex. Vivamus
-                    gravida, ex pellentesque vestibulum dictum, magna dui pulvinar augue, eget tristique lorem orci nec
-                    ex. Nunc malesuada
-                    enim eu lacus congue semper. Vestibulum ut ex ac lorem tempor fermentum viverra a est. Proin libero
-                    dolor, dapibus
-                    vitae ante sed, vehicula efficitur purus. Nam vel nisl maximus, suscipit enim nec, aliquam dolor.
-                    Sed tincidunt, augue
-                    sit amet tristique sollicitudin, libero diam pulvinar urna, tincidunt posuere nibh mi auctor lacus.
-                    Sed in lobortis
-                    sapien, vel sagittis magna.</p>
-            </div>
-        </div>
-        <div class="row text-center">
-            <div class="col-md-4">
-                <i class="fas fa-heart fa-1x"></i>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere magna vel quam suscipit
-                    fermentum. Sed luctus quam
-                    in tortor ultrices, in euismod urna imperdiet. Quisque nisi lectus, eleifend sit.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fas fa-heart fa-2x"></i>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere magna vel quam suscipit
-                    fermentum. Sed luctus quam
-                    in tortor ultrices, in euismod urna imperdiet. Quisque nisi lectus, eleifend sit.</p>
-            </div>
-            <div class="col-md-4">
-                <i class="fas fa-heart fa-3x"></i>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed posuere magna vel quam suscipit
-                    fermentum. Sed luctus quam
-                    in tortor ultrices, in euismod urna imperdiet. Quisque nisi lectus, eleifend sit.</p>
-            </div>
-        </div>
+        <router-outlet></router-outlet>
     </div>
 </main>
-<router-outlet></router-outlet>

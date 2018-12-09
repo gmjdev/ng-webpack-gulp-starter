@@ -3,7 +3,6 @@ import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
 import { hmrBootstrap } from './hmr';
 import { environment } from '../environments/environment';
-import './main.scss';
 
 if (environment.production) {
     enableProdMode();

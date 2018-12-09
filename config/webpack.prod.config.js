@@ -30,7 +30,7 @@ const uglifyJsOptions = {
     parallel: true,
     sourceMap: true,
     cache: true,
-    extractComments: true,
+    extractComments: false,
     terserOptions: {
         warnings: false,
         compress: {
@@ -59,38 +59,20 @@ export const config = merge(WebPackCommonConfig, {
         path: destinationPath
     },
     optimization: {
-        noEmitOnErrors: true,
         runtimeChunk: 'single',
-        namedModules: true, // NamedModulesPlugin()
-        concatenateModules: true, //ModuleConcatenationPlugin
-        minimize: true,
-        splitChunks: { // CommonsChunkPlugin()
+        removeAvailableModules: true,
+        removeEmptyChunks: true,
+        splitChunks: {
             name: true,
             chunks: 'all',
-            automaticNameDelimiter: '-',
-            cacheGroups: {
-                default: {
-                    minChunks: 2,
-                    priority: 10,
-                    reuseExistingChunk: true
-                },
-                styles: {
-                    name: 'styles',
-                    chunks: 'all',
-                    enforce: true,
-                    test: /([\\|/]node_modules[\\|/]?)([\\|/](\w[\w ]*.*))+[\\|/]?(.css)/
-                },
-                vendor: {
-                    test: /[\\/]node_modules[\\/]/,
-                },
-            }
+            automaticNameDelimiter: '-'
         },
         minimizer: [
             new HashedModuleIdsPlugin(),
             new TerserPlugin(uglifyJsOptions),
             new CleanCssWebpackPlugin({
                 sourceMap: true,
-                test: (file) => /\.(?:css)$/.test(file),
+                test: (file) => /\.(sc|sa|c)ss$/.test(file),
             }),
             new OptimizeCSSAssetsPlugin({})
         ]
@@ -118,13 +100,12 @@ export const config = merge(WebPackCommonConfig, {
         }),
         new SourceMapDevToolPlugin({
             filename: 'sourcemaps/[file].map',
-            exclude: ['vendor.js']
+            exclude: /vendor$/
         }),
         new CleanWebpackPlugin(pathsToClean, cleanOptions),
         new MiniCssExtractPlugin({
             cache: true,
-            filename: appConfig.bundle.cssPattern || 'css/[name].[contenthash:8].css',
-            chunkFilename: '[id].css'
+            filename: appConfig.bundle.cssPattern || 'css/[name].[contenthash:8].css'
         })
     ],
 });
