@@ -55,7 +55,7 @@ function serve() {
     app.use(middleware(compiler, {
         noInfo: true,
         publicPath: webPackConfig.output.publicPath,
-        logLevel: 'debug',
+        logLevel: 'warn',
         overlay: {
             warnings: false,
             errors: true

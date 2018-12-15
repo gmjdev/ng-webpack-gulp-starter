@@ -5,8 +5,6 @@ import {
 } from '../util/util';
 import {
     ProvidePlugin,
-    AutomaticPrefetchPlugin,
-    HashedModuleIdsPlugin,
     BannerPlugin,
     WatchIgnorePlugin,
     ContextReplacementPlugin
@@ -20,20 +18,23 @@ import {
 import * as moment from 'moment';
 import CircularDependencyPlugin from 'circular-dependency-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import rxPaths from 'rxjs/_esm5/path-mapping';
 import {
     SuppressExtractedTextChunksWebpackPlugin
 } from '@angular-devkit/build-angular/src/angular-cli-files/plugins/suppress-entry-chunks-webpack-plugin';
-import LiveReloadPlugin from 'webpack-livereload-plugin';
 const cwd = process.cwd();
 const appConfig = IoUtil.readJsonFile(path.join(cwd, 'app-config.json'));
 const srcDirPath = path.join(cwd, appConfig.source.srcDir);
+const assetDirPath = path.join(cwd, appConfig.source.srcDir, appConfig.source.assetsDir);
 const includePaths = [
     path.join(cwd, 'node_modules/angular-bootstrap-md/scss/bootstrap')
 ];
 const vendorEntries = ['./src/vendor.ts', './src/vendor.scss'];
 const appEntries = ['./src/main.ts', './src/main.scss'];
+const pathAlias = _.merge({
+    // rxPaths()
+    assets: assetDirPath
+}, rxPaths());
 
 function processBanner() {
     const data = {
@@ -120,7 +121,14 @@ const webpackRules = [{
     },
     {
         test: /\.(png|jpe?g|gif|svg|woff|woff2|ttf|eot|ico)$/,
-        use: ['file-loader?name=assets/[name].[hash].[ext]']
+        use: [{
+            loader: 'url-loader',
+            options: {
+                emitFile: false,
+                name: '[name].[ext]',
+                outputPath: 'assets/images'
+            }
+        }]
     }, {
         test: /\.ejs$/,
         loader: 'ejs-loader'
@@ -147,7 +155,7 @@ const webpackRules = [{
 /* eslint-enable indent */
 
 let assets = [{
-    from: path.join(cwd, appConfig.source.srcDir, appConfig.source.assetsDir),
+    from: assetDirPath,
     to: appConfig.source.assetsDir
 }];
 
@@ -197,7 +205,7 @@ export const WebPackCommonConfig = {
             srcDirPath
         ],
         extensions: appConfig.source.allowedExtension,
-        alias: rxPaths()
+        alias: pathAlias
     },
     output: {
         filename: appConfig.bundle.jsPattern || 'js/[name].[hash:8].js',
@@ -246,23 +254,16 @@ export const WebPackCommonConfig = {
         exprContextCritical: false
     },
     plugins: [
-        // new LiveReloadPlugin({
-        //     protocol: appConfig.server.https ? 'https' : 'http',
-        //     hostname: appConfig.server.host,
-        //     appendScriptTag: true,
-        // }),
         new CopyWebpackPlugin(assets),
-        // new AutomaticPrefetchPlugin(),
-        // new HashedModuleIdsPlugin(),
         new SuppressExtractedTextChunksWebpackPlugin(),
         new CircularDependencyPlugin({
             exclude: /[\\/]node_modules[\\/]/
         }),
-        // new BannerPlugin({
-        //     banner: processBanner(),
-        //     raw: false,
-        //     exclude: /vendor/
-        // }),
+        new BannerPlugin({
+            banner: processBanner(),
+            raw: false,
+            exclude: /[\\/][node_modules|polyfills|vendors][\\/]/
+        }),
         new BundleAnalyzerPlugin({
             openAnalyzer: false,
             logLevel: 'warn'
@@ -286,8 +287,7 @@ export const WebPackCommonConfig = {
                 appConfig.indexHtml.templateFile),
             title: appConfig.indexHtml.title,
             xhtml: true,
-            data: appConfig.indexHtml,
-            favicon: appConfig.indexHtml.favicon
+            data: appConfig.indexHtml
         })
     ]
 };

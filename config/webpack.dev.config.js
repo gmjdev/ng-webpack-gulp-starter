@@ -13,7 +13,6 @@ import {
     Util,
     LogUtil
 } from '../util/util';
-import MiniCssExtractPlugin from 'mini-css-extract-plugin';
 import {
     AngularCompilerPlugin
 } from '@ngtools/webpack';
@@ -55,14 +54,14 @@ let devConfiguration = {
         proxy: appConfig.server.proxy || {}
     },
     plugins: [
-        new HardSourceWebpackPlugin({
-            cacheDirectory: path.join(cwd, 'cache'),
-            environmentHash: {
-                root: process.cwd(),
-                directories: [],
-                files: ['package-lock.json'],
-            },
-        }),
+        // new HardSourceWebpackPlugin({
+        //     cacheDirectory: path.join(cwd, 'cache'),
+        //     environmentHash: {
+        //         root: process.cwd(),
+        //         directories: [],
+        //         files: ['package-lock.json'],
+        //     },
+        // }),
         new AngularCompilerPlugin({
             tsConfigPath: path.join(cwd, appConfig.source.srcDir,
                 appConfig.source.appTsConfig),
@@ -79,11 +78,7 @@ let devConfiguration = {
                 'NODE_ENV': appConfig.environments.dev
             })
         }),
-        new CleanWebpackPlugin(pathsToClean, cleanOptions),
-        // new MiniCssExtractPlugin({
-        //     filename: 'css/[name].css',
-        //     chunkFilename: '[id].css'
-        // })
+        new CleanWebpackPlugin(pathsToClean, cleanOptions)
     ],
 };
 
